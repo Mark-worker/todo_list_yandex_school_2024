@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list_yandex_school_2024/features/models/task_model.dart';
 
-import '../../../edit_task_screen/edit_task_page.dart';
+import '../../../edit_task_screen/edit_task_screen.dart';
 
 class CheckboxLine extends StatelessWidget {
   final TaskModel task;
@@ -19,18 +19,18 @@ class CheckboxLine extends StatelessWidget {
             flex: 1,
             child: Checkbox(
                 activeColor: Colors.green,
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(
                       width: 2.0,
                       color: task.isDone
                           ? Colors.green
-                          : task.priority != Priority.high
+                          : task.priority != TaskPriority.high
                               ? Colors.grey
                               : Colors.red),
                 ),
-                overlayColor: task.priority != Priority.high
-                    ? MaterialStateProperty.all(Colors.white60)
-                    : MaterialStateProperty.all(Colors.red),
+                overlayColor: task.priority != TaskPriority.high
+                    ? WidgetStateProperty.all(Colors.white60)
+                    : WidgetStateProperty.all(Colors.red),
                 value: task.isDone,
                 onChanged: onChanged),
           ),
