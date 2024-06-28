@@ -7,6 +7,8 @@ environment:
   sdk: '>=3.2.6 <4.0.0'
 
 dependencies:
+  logger: ^2.3.0
+  intl: ^0.19.0
   flutter:
     sdk: flutter
 
@@ -14,6 +16,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "assets/logo_foreground.png"
 
 flutter:
   uses-material-design: true
