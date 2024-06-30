@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list_yandex_school_2024/features/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
+import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 
 import '../../../edit_task_screen/edit_task_screen.dart';
 
-class CheckboxLine extends StatelessWidget {
-  final TaskModel task;
+class CheckboxLine extends StatefulWidget {
+  TaskModel task;
   final ValueChanged<bool?> onChanged;
 
-  const CheckboxLine({super.key, required this.task, required this.onChanged});
+  CheckboxLine({super.key, required this.task, required this.onChanged});
 
+  @override
+  State<CheckboxLine> createState() => _CheckboxLineState();
+}
+
+class _CheckboxLineState extends State<CheckboxLine> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -22,17 +28,17 @@ class CheckboxLine extends StatelessWidget {
                 side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(
                       width: 2.0,
-                      color: task.isDone
+                      color: widget.task.isDone
                           ? Colors.green
-                          : task.priority != TaskPriority.high
+                          : widget.task.priority != TaskPriority.high
                               ? Colors.grey
                               : Colors.red),
                 ),
-                overlayColor: task.priority != TaskPriority.high
+                overlayColor: widget.task.priority != TaskPriority.high
                     ? WidgetStateProperty.all(Colors.white60)
                     : WidgetStateProperty.all(Colors.red),
-                value: task.isDone,
-                onChanged: onChanged),
+                value: widget.task.isDone,
+                onChanged: widget.onChanged),
           ),
           Expanded(
               flex: 6,
@@ -42,8 +48,8 @@ class CheckboxLine extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      task.title,
-                      style: task.isDone
+                      widget.task.text,
+                      style: widget.task.isDone
                           ? const TextStyle(
                               fontSize: 16,
                               color: Colors.grey,
@@ -53,9 +59,9 @@ class CheckboxLine extends StatelessWidget {
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (task.deadline != null)
-                      const Text(
-                        "Deadline",
+                    if (widget.task.deadline != null)
+                      Text(
+                        formatDate(widget.task.deadline!),
                         style: TextStyle(
                           color: Colors.grey,
                         ),
@@ -66,11 +72,18 @@ class CheckboxLine extends StatelessWidget {
           Expanded(
             flex: 1,
             child: IconButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  TaskModel? newTask = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const EditTaskPage()));
+                          builder: (context) => EditTaskPage(
+                                editingTask: widget.task,
+                              )));
+                  if (newTask != null) {
+                    setState(() {
+                      widget.task = newTask;
+                    });
+                  }
                 },
                 icon: const Icon(
                   Icons.info_outline,

@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
-
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:todo_list_yandex_school_2024/domain/use_cases/i_use_cases.dart';
+import "package:todo_list_yandex_school_2024/service_locator.dart";
 import 'package:flutter/material.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/features/main_screen/presentation/pages/main_screen.dart';
+import 'package:todo_list_yandex_school_2024/presentation/main_screen/presentation/pages/main_screen.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   PlatformDispatcher.instance.onError = (error, stackTrace) {
@@ -14,7 +18,11 @@ void main() {
     logger.e("FlutterError \n ${details.exception} \n ${details.stack} \n");
   };
   runZonedGuarded(
-    () => runApp(const MainApp()),
+    () {
+      WidgetsFlutterBinding.ensureInitialized();
+      setupLocator();
+      runApp(const MainApp());
+    },
     (error, stackTrace) => logger.e("$error \n $stackTrace \n"),
   );
 }
@@ -24,9 +32,21 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        title: "ToDo Space",
-        debugShowCheckedModeBanner: false,
-        home: MainPage());
+    return MultiProvider(
+      providers: [
+        Provider<IGetAllTasks>(create: (_) => getIt<IGetAllTasks>()),
+        Provider<IAddTask>(create: (_) => getIt<IAddTask>()),
+        Provider<IUpdateTasks>(create: (_) => getIt<IUpdateTasks>()),
+        Provider<IDeleteTask>(create: (_) => getIt<IDeleteTask>()),
+        Provider<IChangeTask>(create: (_) => getIt<IChangeTask>()),
+        Provider<IGetTask>(create: (_) => getIt<IGetTask>()),
+        Provider<Uuid>(create: (_) => getIt<Uuid>()),
+        Provider<DeviceInfoPlugin>(create: (_) => getIt<DeviceInfoPlugin>()),
+      ],
+      child: const MaterialApp(
+          title: "ToDo Space",
+          debugShowCheckedModeBanner: false,
+          home: MainPage()),
+    );
   }
 }

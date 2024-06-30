@@ -1,21 +1,48 @@
 import 'dart:developer';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
-import 'package:todo_list_yandex_school_2024/features/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/domain/use_cases/i_use_cases.dart';
+import 'package:todo_list_yandex_school_2024/domain/use_cases/use_cases.dart';
+import 'package:todo_list_yandex_school_2024/service_locator.dart';
+import 'package:uuid/uuid.dart';
 
 class EditTaskPage extends StatefulWidget {
-  const EditTaskPage({super.key});
+  final TaskModel? editingTask;
+
+  const EditTaskPage({super.key, this.editingTask});
 
   @override
   State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
 class _EditTaskPageState extends State<EditTaskPage> {
-  TaskPriority importanceValue = TaskPriority.none;
-  bool switcherValue = false;
+  final TextEditingController _controller = TextEditingController();
 
+  late bool isEditing;
+  late bool switcherValue;
+  TaskPriority importanceValue = TaskPriority.none;
   DateTime? selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    isEditing = widget.editingTask != null;
+    _controller.text = isEditing ? widget.editingTask!.text : "";
+    switcherValue = isEditing ? widget.editingTask!.deadline != null : false;
+    importanceValue =
+        isEditing ? widget.editingTask!.priority : TaskPriority.none;
+    selectedDate = isEditing ? widget.editingTask!.deadline : null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +57,26 @@ class _EditTaskPageState extends State<EditTaskPage> {
             )),
         actions: [
           TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                if (_controller.text == "") return;
+
+                if (isEditing) {
+                  final taskToChange = widget.editingTask!.copyWith(
+                      text: _controller.text,
+                      deadline: selectedDate,
+                      priority: importanceValue,
+                      changedAt: DateTime.now(),
+                      phoneIdentifier:
+                          await _getPhoneId(context.read<DeviceInfoPlugin>()));
+                  await context.read<IChangeTask>()(taskToChange);
+                  Navigator.pop(context, taskToChange);
+                } else {
+                  final taskToSave = await _createTask(
+                      context.read<Uuid>(), context.read<DeviceInfoPlugin>());
+                  await context.read<IAddTask>()(taskToSave);
+                  Navigator.pop(context, taskToSave);
+                }
+              },
               child: const Text(
                 "СОХРАНИТЬ",
                 style: TextStyle(color: Colors.blue),
@@ -168,7 +214,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
             borderRadius: BorderRadius.circular(8),
             color: Colors.white,
             boxShadow: const [BoxShadow(color: Colors.grey)]),
-        child: const TextField(
+        child: TextField(
+          controller: _controller,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           maxLines: null,
@@ -223,5 +270,23 @@ class _EditTaskPageState extends State<EditTaskPage> {
         ],
       ),
     );
+  }
+
+  Future<TaskModel> _createTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
+    return TaskModel(
+        id: uuid.v1(),
+        text: _controller.text,
+        priority: importanceValue,
+        isDone: false,
+        createdAt: DateTime.now(),
+        changedAt: DateTime.now(),
+        phoneIdentifier: await _getPhoneId(deviceInfo),
+        deadline: selectedDate);
+  }
+
+  Future<String> _getPhoneId(DeviceInfoPlugin deviceInfo) async {
+    var androidDeviceInfo = await deviceInfo.androidInfo;
+    String phoneId = androidDeviceInfo.id;
+    return phoneId;
   }
 }
