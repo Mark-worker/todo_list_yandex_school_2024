@@ -26,16 +26,14 @@ void setupLocator() {
       TaskRepository(getIt<LocalDataSource>(), getIt<RemoteDataSource>()));
 
   // Register use cases
-  getIt.registerLazySingleton<IGetAllTasks>(
-      () => GetAllTasks(getIt<TaskRepository>()));
-  getIt.registerLazySingleton<IAddTask>(() => AddTask(getIt<TaskRepository>()));
-  getIt.registerLazySingleton<IUpdateTasks>(
-      () => UpdateTasks(getIt<TaskRepository>()));
-  getIt.registerLazySingleton<IDeleteTask>(
-      () => DeleteTask(getIt<TaskRepository>()));
-  getIt.registerLazySingleton<IChangeTask>(
-      () => ChangeTask(getIt<TaskRepository>()));
-  getIt.registerLazySingleton<IGetTask>(() => GetTask(getIt<TaskRepository>()));
+  getIt.registerLazySingleton<UseCases>(() => UseCases(
+        getAllTasks: GetAllTasks(getIt<TaskRepository>()),
+        addTask: AddTask(getIt<TaskRepository>()),
+        updateTasks: UpdateTasks(getIt<TaskRepository>()),
+        deleteTask: DeleteTask(getIt<TaskRepository>()),
+        changeTask: ChangeTask(getIt<TaskRepository>()),
+        getTask: GetTask(getIt<TaskRepository>()),
+      ));
 
   //Register external
   getIt.registerLazySingleton<Dio>(() => Dio());

@@ -10,6 +10,10 @@ class ProxyDataSource implements IDataSource {
 
   ProxyDataSource(this._localDataSource, this._remoteDataSource);
 
+  List<TaskModel> get listOfTasks {
+    return _localDataSource.currentListOfTasks;
+  }
+
   @override
   Future<List<TaskModel>> getAllTasks() async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
@@ -21,39 +25,39 @@ class ProxyDataSource implements IDataSource {
   }
 
   @override
-  Future<void> addTask(TaskModel task) async {
+  Future<TaskModel> addTask(TaskModel task) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
       await _remoteDataSource.addTask(task);
     }
-    await _localDataSource.addTask(task);
+    return await _localDataSource.addTask(task);
   }
 
   @override
-  Future<void> updateTasks(List<TaskModel> tasks) async {
+  Future<List<TaskModel>> updateTasks(List<TaskModel> tasks) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
-      await _remoteDataSource.updateTasks(tasks);
+      return await _remoteDataSource.updateTasks(tasks);
     }
-    await _localDataSource.updateTasks(tasks);
+    return await _localDataSource.updateTasks(tasks);
   }
 
   @override
-  Future<void> deleteTask(String taskId) async {
+  Future<TaskModel> deleteTask(String taskId) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
-      await _remoteDataSource.deleteTask(taskId);
+      return await _remoteDataSource.deleteTask(taskId);
     }
-    await _localDataSource.deleteTask(taskId);
+    return await _localDataSource.deleteTask(taskId);
   }
 
   @override
-  Future<void> changeTask(TaskModel task) async {
+  Future<TaskModel> changeTask(TaskModel task) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
-      await _remoteDataSource.changeTask(task);
+      return await _remoteDataSource.changeTask(task);
     }
-    await _localDataSource.changeTask(task);
+    return await _localDataSource.changeTask(task);
   }
 
   @override

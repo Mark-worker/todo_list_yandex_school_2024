@@ -1,6 +1,25 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/data/task_repository.dart';
 import 'package:todo_list_yandex_school_2024/domain/use_cases/i_use_cases.dart';
+
+class UseCases {
+  IGetAllTasks getAllTasks;
+  IAddTask addTask;
+  IUpdateTasks updateTasks;
+  IDeleteTask deleteTask;
+  IChangeTask changeTask;
+  IGetTask getTask;
+
+  UseCases({
+    required this.getAllTasks,
+    required this.addTask,
+    required this.updateTasks,
+    required this.deleteTask,
+    required this.changeTask,
+    required this.getTask,
+  });
+}
 
 class GetAllTasks implements IGetAllTasks {
   final TaskRepository repository;

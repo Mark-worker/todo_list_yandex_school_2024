@@ -6,16 +6,20 @@ import 'package:todo_list_yandex_school_2024/domain/i_task_repository.dart';
 
 class TaskRepository implements ITaskRepository {
   final ProxyDataSource _proxyDataSource;
+  List<TaskModel> _currentListOfTasks = [];
 
   TaskRepository(
       LocalDataSource localDataSource, RemoteDataSource remoteDataSource)
       : _proxyDataSource = ProxyDataSource(localDataSource, remoteDataSource);
 
   @override
+  List<TaskModel> get listOfTasks => _proxyDataSource.listOfTasks;
+
+  @override
   Future<List<TaskModel>> getAllTasks() async {
     try {
-      final tasks = await _proxyDataSource.getAllTasks();
-      return tasks;
+      _currentListOfTasks = await _proxyDataSource.getAllTasks();
+      return _currentListOfTasks;
     } catch (e) {
       rethrow;
     }
@@ -25,6 +29,7 @@ class TaskRepository implements ITaskRepository {
   Future<void> addTask(TaskModel task) async {
     try {
       await _proxyDataSource.addTask(task);
+      _currentListOfTasks.add(task);
     } catch (e) {
       rethrow;
     }
@@ -33,7 +38,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<void> updateTasks(List<TaskModel> tasks) async {
     try {
-      await _proxyDataSource.updateTasks(tasks);
+      _currentListOfTasks = await _proxyDataSource.updateTasks(tasks);
     } catch (e) {
       rethrow;
     }

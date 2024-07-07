@@ -10,27 +10,39 @@ class LocalDataSource implements IDataSource {
   static const String _revisionKey = 'revision_key';
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  List<TaskModel> _currentListOfTasks = [];
+
+  List<TaskModel> get currentListOfTasks => _currentListOfTasks;
 
   @override
-  Future<void> addTask(TaskModel task) async {
-    final tasks = await getAllTasks();
+  Future<TaskModel> addTask(TaskModel task) async {
+    final tasks = _currentListOfTasks;
     tasks.add(task);
     await saveTasks(tasks);
+    return task;
   }
 
   @override
-  Future<void> changeTask(TaskModel task) async {
-    final tasks = await getAllTasks();
+  Future<TaskModel> changeTask(TaskModel task) async {
+    final tasks = _currentListOfTasks;
     final taskId = tasks.indexWhere((elem) => elem.id == task.id);
     tasks[taskId] = task;
     await saveTasks(tasks);
+    return task;
   }
 
   @override
-  Future<void> deleteTask(String taskId) async {
-    final tasks = await getAllTasks();
-    tasks.removeWhere((task) => task.id == taskId);
-    await saveTasks(tasks);
+  Future<TaskModel> deleteTask(String taskId) async {
+    final tasks = _currentListOfTasks;
+    for (int i = 0; i < tasks.length; i++) {
+      final task = tasks[i];
+      if (task.id == taskId) {
+        tasks.remove(task);
+        await saveTasks(tasks);
+        return task;
+      }
+    }
+    throw Exception("Couldn't delete task from local repository");
   }
 
   @override
@@ -42,23 +54,27 @@ class LocalDataSource implements IDataSource {
     }
     final List<dynamic> tasksJson = jsonDecode(tasksString);
     logger.d(tasksJson);
-    return tasksJson.map((json) => TaskModel.fromMap(json)).toList();
+    final List<TaskModel> tasks =
+        tasksJson.map((json) => TaskModel.fromMap(json)).toList();
+    tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return tasks;
   }
 
   @override
   Future<TaskModel> getTask(String taskId) async {
-    final List<TaskModel> tasks = await getAllTasks();
-    final TaskModel task =
-        tasks.where((elem) => elem.id.toString() == taskId).first;
+    final List<TaskModel> tasks = _currentListOfTasks;
+    final TaskModel task = tasks.where((elem) => elem.id == taskId).first;
     return task;
   }
 
   @override
-  Future<void> updateTasks(List<TaskModel> tasks) async {
+  Future<List<TaskModel>> updateTasks(List<TaskModel> tasks) async {
     await saveTasks(tasks);
+    return _currentListOfTasks;
   }
 
   Future<void> saveTasks(List<TaskModel> tasks) async {
+    _currentListOfTasks = tasks;
     final prefs = await _prefs;
     final String tasksString =
         jsonEncode(tasks.map((task) => task.toMap()).toList());
