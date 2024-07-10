@@ -1,21 +1,46 @@
-import 'dart:developer';
-
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
-import 'package:todo_list_yandex_school_2024/features/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
+import 'package:uuid/uuid.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class EditTaskPage extends StatefulWidget {
-  const EditTaskPage({super.key});
+  final TaskModel? editingTask;
+
+  const EditTaskPage({super.key, this.editingTask});
 
   @override
   State<EditTaskPage> createState() => _EditTaskPageState();
 }
 
 class _EditTaskPageState extends State<EditTaskPage> {
-  TaskPriority importanceValue = TaskPriority.none;
-  bool switcherValue = false;
+  final TextEditingController _controller = TextEditingController();
 
+  late bool isEditing;
+  late bool switcherValue;
+  TaskPriority importanceValue = TaskPriority.none;
   DateTime? selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    isEditing = widget.editingTask != null;
+    _controller.text = isEditing ? widget.editingTask!.text : "";
+    switcherValue = isEditing ? widget.editingTask!.deadline != null : false;
+    importanceValue =
+        isEditing ? widget.editingTask!.priority : TaskPriority.none;
+    selectedDate = isEditing ? widget.editingTask!.deadline : null;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +55,28 @@ class _EditTaskPageState extends State<EditTaskPage> {
             )),
         actions: [
           TextButton(
-              onPressed: () {},
-              child: const Text(
-                "СОХРАНИТЬ",
+              onPressed: () async {
+                if (_controller.text == "") return;
+
+                if (isEditing) {
+                  final taskToChange = widget.editingTask!.copyWith(
+                      text: _controller.text,
+                      deadline: switcherValue
+                          ? selectedDate
+                          : DateTime.fromMillisecondsSinceEpoch(0),
+                      priority: importanceValue,
+                      changedAt: DateTime.now(),
+                      phoneIdentifier:
+                          await _getPhoneId(context.read<DeviceInfoPlugin>()));
+                  Navigator.pop(context, taskToChange);
+                } else {
+                  final taskToSave = await _createTask(
+                      context.read<Uuid>(), context.read<DeviceInfoPlugin>());
+                  Navigator.pop(context, taskToSave);
+                }
+              },
+              child: Text(
+                AppLocalizations.of(context)!.saveButton.toUpperCase(),
                 style: TextStyle(color: Colors.blue),
               ))
         ],
@@ -49,8 +93,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
               const SizedBox(
                 height: 30,
               ),
-              const Text(
-                "Важность",
+              Text(
+                AppLocalizations.of(context)!.importanceTitle,
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
@@ -63,14 +107,14 @@ class _EditTaskPageState extends State<EditTaskPage> {
                 enableFeedback: false,
                 itemBuilder: (BuildContext context) {
                   return TaskPriority.values.map<PopupMenuItem>((item) {
-                    String value = item.toNameString;
+                    String value = importanceToString(item);
                     return PopupMenuItem(
                         value: item,
                         child: SizedBox(
                           width: 100,
                           child: Text(value,
                               style: TextStyle(
-                                  color: value != "!! Высокий"
+                                  color: value != AppLocalizations.of(context)!.highImportance
                                       ? Colors.black
                                       : Colors.red,
                                   fontWeight: FontWeight.w400,
@@ -84,9 +128,10 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     height: 30,
                     width: double.infinity,
                     child: Text(
-                      importanceValue.toNameString,
+                      importanceToString(importanceValue),
                       style: TextStyle(
-                          color: importanceValue.toNameString != "!! Высокий"
+                          color: importanceToString(importanceValue) !=
+                                  AppLocalizations.of(context)!.highImportance
                               ? Colors.grey
                               : Colors.red),
                     )),
@@ -106,8 +151,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Сделать до",
+                      Text(
+                        AppLocalizations.of(context)!.doUntilTitle,
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -115,7 +160,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       ),
                       if (selectedDate != null)
                         Text(
-                          formatDate(selectedDate!),
+                          formatDate(selectedDate!, AppLocalizations.of(context)!.languageCode),
                           style:
                               const TextStyle(color: Colors.blue, fontSize: 14),
                         )
@@ -153,7 +198,17 @@ class _EditTaskPageState extends State<EditTaskPage> {
         selectedDate = picked;
       });
     }
-    log("User has selected date: $selectedDate");
+  }
+
+  String importanceToString(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.none:
+        return AppLocalizations.of(context)!.noneImportance;
+      case TaskPriority.low:
+        return AppLocalizations.of(context)!.lowImportance;
+      case TaskPriority.high:
+        return AppLocalizations.of(context)!.highImportance;
+    }
   }
 
   Widget _InputCard() {
@@ -168,13 +223,14 @@ class _EditTaskPageState extends State<EditTaskPage> {
             borderRadius: BorderRadius.circular(8),
             color: Colors.white,
             boxShadow: const [BoxShadow(color: Colors.grey)]),
-        child: const TextField(
+        child: TextField(
+          controller: _controller,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           maxLines: null,
           minLines: 4,
           decoration: InputDecoration(
-            hintText: "Что надо сделать...",
+            hintText: AppLocalizations.of(context)!.textFieldHint,
             hintStyle: TextStyle(color: Color(0x36000000)),
             border: InputBorder.none,
           ),
@@ -198,7 +254,6 @@ class _EditTaskPageState extends State<EditTaskPage> {
             } else {
               switcherValue = false;
             }
-            log("User have tapped switcher. Position: $switcherValue");
           });
         });
   }
@@ -206,22 +261,51 @@ class _EditTaskPageState extends State<EditTaskPage> {
   Widget _DeleteButton() {
     return Container(
       margin: const EdgeInsets.all(4),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Text(
-            "Удалить",
-            style: TextStyle(color: Colors.red, fontSize: 16),
-          )
-        ],
+      child: InkWell(
+        onTap: () {
+          if (widget.editingTask != null) {
+            context
+                .read<TaskListBloc>()
+                .add(DeleteTaskEvent(widget.editingTask!));
+            Navigator.pop(context);
+          }
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              AppLocalizations.of(context)!.deleteButton,
+              style: TextStyle(color: Colors.red, fontSize: 16),
+            )
+          ],
+        ),
       ),
     );
+  }
+
+  Future<TaskModel> _createTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
+    return TaskModel(
+        id: uuid.v1(),
+        text: _controller.text,
+        priority: importanceValue,
+        isDone: false,
+        createdAt: DateTime.now(),
+        changedAt: DateTime.now(),
+        phoneIdentifier: await _getPhoneId(deviceInfo),
+        deadline: selectedDate);
+  }
+
+  Future<String> _getPhoneId(DeviceInfoPlugin deviceInfo) async {
+    var androidDeviceInfo = await deviceInfo.androidInfo;
+    String phoneId = androidDeviceInfo.id;
+    return phoneId;
   }
 }

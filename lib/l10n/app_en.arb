@@ -1,0 +1,58 @@
+ {
+    "language" : "English",
+    "@language": {
+        "description": "The current language"
+    },
+    "languageCode": "en",
+    "@languageCode": {
+        "description": "The current language code. In particular, used by date formatter"
+    },
+    "appBarTitle": "My Tasks",
+    "@appBarTitle": {
+        "description": "The text in the appbar at the main page with list of tasks"
+    },
+    "howMuchDone": "Done",
+    "@howMuchDone": {
+        "description": "Counter of done tasks under the appbar at the main page"
+    },
+    "newTask": "New...",
+    "@newTask": {
+        "description": "Text for the tile at the bottom of task list that allows you to create a new task"
+    },
+    "noTasksAvailable": "you don't have tasks to complete. Create task by pressing '+'",
+    "@noTasksAvailable": {
+        "description": "Text that appears at the center of the screen in case user doesn't have any tasks"
+    },
+    "saveButton": "Save",
+    "@saveButton": {
+        "description": "Title of the button that allows you to save your task at the edit page"
+    },
+    "textFieldHint": "What do I need to do...",
+    "@textFieldHint": {
+        "description": "Hint in the text field at the edit page that appears in case user didn't write anything in it"
+    },
+    "importanceTitle": "Importance",
+    "@importanceTitle": {
+        "description": "Title of field 'Importance' at the edit page"
+    },
+    "noneImportance": "None",
+    "@noneImportance": {
+        "description": "Name of none-level importance at the edit page"
+    },
+    "lowImportance": "Low",
+    "@lowImportance": {
+        "description": "Name of low-level importance at the edit page"
+    },
+    "highImportance": "!! High",
+    "@highImportance": {
+        "description": "Name of high-level importance at the edit page"
+    },
+    "doUntilTitle": "Do until",
+    "@doUntilTitle": {
+        "description": "Title of switcher above the deadline at the edit page"
+    },
+    "deleteButton": "Delete",
+    "@deleteButton": {
+        "description": "Name of the button 'Delete' at the edit page"
+    }
+}
