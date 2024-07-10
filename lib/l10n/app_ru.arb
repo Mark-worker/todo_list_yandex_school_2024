@@ -1,0 +1,16 @@
+{
+    "language" : "Русский",
+    "languageCode": "ru",
+    "appBarTitle": "Мои дела",
+    "howMuchDone": "Выполнено",
+    "newTask": "Новое...",
+    "noTasksAvailable": "У вас нет назначенных задач. Создайте задачу, нажав '+'",
+    "saveButton": "Сохранить",
+    "textFieldHint": "Что надо сделать...",
+    "importanceTitle": "Важность",
+    "noneImportance": "Нет",
+    "lowImportance": "Низкий",
+    "highImportance": "!! Высокий",
+    "doUntilTitle": "Сделать до",
+    "deleteButton": "Удалить"
+}

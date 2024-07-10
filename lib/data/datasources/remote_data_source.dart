@@ -44,7 +44,7 @@ class RemoteDataSource implements IDataSource {
         'X-Last-Known-Revision': _revision.toString()
       }),
     );
-    _revision = response.data["revision"]++;
+    _revision = response.data["revision"];
     if (response.statusCode == 200) {
       final task =
           TaskModel.fromMap(response.data["element"] as Map<String, dynamic>);
@@ -76,6 +76,7 @@ class RemoteDataSource implements IDataSource {
           .map((task) => TaskModel.fromMap(task))
           .toList();
       _currentListOfTasks = listOfTasks;
+      _revision = response.data["revision"];
       return listOfTasks;
     } else {
       throw Exception('Failed to update task');
@@ -92,13 +93,7 @@ class RemoteDataSource implements IDataSource {
       }),
     );
     if (response.statusCode == 200) {
-      // for (int i = 0; i < _currentListOfTasks.length; i++) {
-      //   final task = _currentListOfTasks[i];
-      //   if (task.id == taskId) {
-      //     _currentListOfTasks.remove(task);
-      //   }
-      // }
-      _revision = response.data["revision"]++;
+      _revision = response.data["revision"];
       final task =
           TaskModel.fromMap(response.data["element"] as Map<String, dynamic>);
       return task;

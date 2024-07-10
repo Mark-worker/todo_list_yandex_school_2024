@@ -6,6 +6,7 @@ import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_eve
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_states.dart';
 import 'package:todo_list_yandex_school_2024/presentation/edit_task_screen/edit_task_screen.dart';
 import 'package:todo_list_yandex_school_2024/presentation/main_screen/presentation/widgets/checkbox_line.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({super.key});
@@ -71,7 +72,8 @@ class _MainPageState extends State<MainPage> {
             // }
             // return TaskListBuilder();
           } else if (state is LoadedState && state.listOfTasks.isEmpty) {
-            return Center(child: Text("No tasks available"));
+            return Center(
+                child: Text(AppLocalizations.of(context)!.noTasksAvailable));
           } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
             listOfTasks = state.listOfTasks;
             _updateTaskList();
@@ -135,8 +137,8 @@ class _MainPageState extends State<MainPage> {
             child: Container(
               height: 30,
               margin: const EdgeInsets.all(8),
-              child: const Text(
-                "Новое...",
+              child: Text(
+                AppLocalizations.of(context)!.newTask,
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
             ),
@@ -148,7 +150,7 @@ class _MainPageState extends State<MainPage> {
 
   List<Widget> CustomAppBar() {
     return [
-      const SliverAppBar(
+      SliverAppBar(
           backgroundColor: Color(0xfff7f6f2),
           pinned: true,
           snap: false,
@@ -156,7 +158,7 @@ class _MainPageState extends State<MainPage> {
           expandedHeight: 140,
           flexibleSpace: FlexibleSpaceBar(
             title: Text(
-              "Мои дела",
+              AppLocalizations.of(context)!.appBarTitle,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 28,
@@ -174,7 +176,7 @@ class _MainPageState extends State<MainPage> {
                   width: MediaQuery.of(context).size.width * 0.18,
                 ),
                 Text(
-                  "Выполнено - $numOfCheckedBoxes",
+                  "${AppLocalizations.of(context)!.howMuchDone} - $numOfCheckedBoxes",
                   style: const TextStyle(color: Colors.grey, fontSize: 16),
                 ),
               ],

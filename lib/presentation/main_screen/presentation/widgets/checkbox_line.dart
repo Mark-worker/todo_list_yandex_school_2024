@@ -4,6 +4,8 @@ import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 import '../../../edit_task_screen/edit_task_screen.dart';
 
@@ -64,7 +66,7 @@ class _CheckboxLineState extends State<CheckboxLine> {
                     ),
                     if (widget.task.deadline != null)
                       Text(
-                        formatDate(widget.task.deadline!),
+                        formatDate(widget.task.deadline!, AppLocalizations.of(context)!.languageCode),
                         style: TextStyle(
                           color: Colors.grey,
                         ),

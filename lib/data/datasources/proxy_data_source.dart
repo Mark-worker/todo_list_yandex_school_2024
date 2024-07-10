@@ -42,6 +42,9 @@ class ProxyDataSource implements IDataSource {
   @override
   Future<TaskModel> addTask(TaskModel task) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
+    logger.d("remote revision: ${_remoteDataSource.revision}");
+    logger.d("local revision: ${await _localDataSource.getLocalRevision()}");
+
     if (hasConnection) {
       await _remoteDataSource.addTask(task);
       _localDataSource.setLocalRevision(_remoteDataSource.revision!);
