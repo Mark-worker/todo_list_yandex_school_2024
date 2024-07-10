@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
 
 import '../../../edit_task_screen/edit_task_screen.dart';
 
 class CheckboxLine extends StatefulWidget {
-  TaskModel task;
+  final TaskModel task;
   final ValueChanged<bool?> onChanged;
 
   CheckboxLine({super.key, required this.task, required this.onChanged});
@@ -81,7 +84,7 @@ class _CheckboxLineState extends State<CheckboxLine> {
                               )));
                   if (newTask != null) {
                     setState(() {
-                      widget.task = newTask;
+                      context.read<TaskListBloc>().add(UpdateTaskEvent(newTask));
                     });
                   }
                 },

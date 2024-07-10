@@ -4,9 +4,9 @@ abstract class ITaskRepository {
   Future<List<TaskModel>> getAllTasks();
   Future<void> updateTasks(List<TaskModel> task);
   Future<TaskModel> getTask(String taskId);
-  Future<void> addTask(TaskModel task);
-  Future<void> changeTask(TaskModel task);
-  Future<void> deleteTask(String taskId);
+  Future<TaskModel> addTask(TaskModel task);
+  Future<TaskModel> changeTask(TaskModel task);
+  Future<TaskModel> deleteTask(String taskId);
 
   List<TaskModel> get listOfTasks;
 }

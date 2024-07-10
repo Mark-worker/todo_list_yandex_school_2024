@@ -5,9 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/domain/use_cases/i_use_cases.dart';
-import 'package:todo_list_yandex_school_2024/domain/use_cases/use_cases.dart';
-import 'package:todo_list_yandex_school_2024/service_locator.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
 import 'package:uuid/uuid.dart';
 
 class EditTaskPage extends StatefulWidget {
@@ -61,19 +60,22 @@ class _EditTaskPageState extends State<EditTaskPage> {
                 if (_controller.text == "") return;
 
                 if (isEditing) {
+                  log("Previous task: ${widget.editingTask!.toJson()}");
+                  log(switcherValue.toString());
                   final taskToChange = widget.editingTask!.copyWith(
                       text: _controller.text,
-                      deadline: selectedDate,
+                      deadline: switcherValue
+                          ? selectedDate
+                          : DateTime.fromMillisecondsSinceEpoch(0),
                       priority: importanceValue,
                       changedAt: DateTime.now(),
                       phoneIdentifier:
                           await _getPhoneId(context.read<DeviceInfoPlugin>()));
-                  await context.read<IChangeTask>()(taskToChange);
+                  log("Present task: ${taskToChange.toJson()}");
                   Navigator.pop(context, taskToChange);
                 } else {
                   final taskToSave = await _createTask(
                       context.read<Uuid>(), context.read<DeviceInfoPlugin>());
-                  await context.read<IAddTask>()(taskToSave);
                   Navigator.pop(context, taskToSave);
                 }
               },
@@ -253,21 +255,32 @@ class _EditTaskPageState extends State<EditTaskPage> {
   Widget _DeleteButton() {
     return Container(
       margin: const EdgeInsets.all(4),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
-          SizedBox(
-            width: 10,
-          ),
-          Text(
-            "Удалить",
-            style: TextStyle(color: Colors.red, fontSize: 16),
-          )
-        ],
+      child: InkWell(
+        onTap: () {
+          if (widget.editingTask != null) {
+            context
+                .read<TaskListBloc>()
+                .add(DeleteTaskEvent(widget.editingTask!));
+            Navigator.pop(context);
+          }
+        },
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Text(
+              "Удалить",
+              style: TextStyle(color: Colors.red, fontSize: 16),
+            )
+          ],
+        ),
       ),
     );
   }

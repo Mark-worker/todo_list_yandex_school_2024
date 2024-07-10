@@ -1,28 +1,20 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/domain/main_page_data_provider.dart';
-import 'package:todo_list_yandex_school_2024/domain/page_state.dart';
-import 'package:todo_list_yandex_school_2024/domain/use_cases/i_use_cases.dart';
-import 'package:todo_list_yandex_school_2024/domain/use_cases/use_cases.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
+import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_states.dart';
 import 'package:todo_list_yandex_school_2024/presentation/edit_task_screen/edit_task_screen.dart';
 import 'package:todo_list_yandex_school_2024/presentation/main_screen/presentation/widgets/checkbox_line.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   MainPage({super.key});
 
-  late Future<List<TaskModel>> tasks;
-  late UseCases useCases;
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   useCases = context.read<UseCases>();
-  //   tasks = useCases.getAllTasks();
-  // }
-
+class _MainPageState extends State<MainPage> {
   bool showUncompletedTasks = false;
   late int numOfCheckedBoxes;
   late List<TaskModel> listOfShowedTasks;
@@ -37,95 +29,54 @@ class MainPage extends StatelessWidget {
         : listOfTasks;
   }
 
+  late TaskListBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = context.read<TaskListBloc>();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<MainPageDataProvider>(
-        builder: (context, dataProvider, child) {
-      return Scaffold(
-        backgroundColor: const Color(0xfff7f6f2),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              TaskModel? taskToAdd = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const EditTaskPage()));
-              if (taskToAdd != null) {
-                dataProvider.createTask(taskToAdd);
-              }
-            },
-            backgroundColor: Colors.blue,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(30)),
-            ),
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            )),
-        body: Consumer<MainPageDataProvider>(
-            builder: (context, dataProvider, child) {
-          if (dataProvider.state is EmptyState) {
-            dataProvider.fetchData();            return Center(child: CircularProgressIndicator());
-          } else if (dataProvider.state is LoadingState) {
+    return Scaffold(
+      backgroundColor: const Color(0xfff7f6f2),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            TaskModel? taskToAdd = await Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const EditTaskPage()));
+            if (taskToAdd != null) {
+              bloc.add(AddTaskEvent(taskToAdd));
+            }
+          },
+          backgroundColor: Colors.blue,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white,
+          )),
+      body: RefreshIndicator(
+        edgeOffset: 140,
+        onRefresh: () async =>
+            context.read<TaskListBloc>().add(FetchDataEvent()),
+        child:
+            BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
+          if (state is EmptyState || state is LoadingState) {
             return Center(child: CircularProgressIndicator());
-          } else if (dataProvider.state is LoadedState &&
-              dataProvider.listOfTasks.isEmpty) {
+          } else if (state is LoadingState) {
+            // if (state.isFirstFetch) {
+            return Center(child: CircularProgressIndicator());
+            // }
+            // return TaskListBuilder();
+          } else if (state is LoadedState && state.listOfTasks.isEmpty) {
             return Center(child: Text("No tasks available"));
-          } else if (dataProvider.listOfTasks.isNotEmpty) {
-            listOfTasks = dataProvider.listOfTasks;
-            showUncompletedTasks = dataProvider.showUncompletedTasks;
+          } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
+            listOfTasks = state.listOfTasks;
             _updateTaskList();
             return CustomScrollView(slivers: [
-              const SliverAppBar(
-                  backgroundColor: Color(0xfff7f6f2),
-                  pinned: true,
-                  snap: false,
-                  floating: true,
-                  expandedHeight: 140,
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: Text(
-                      "Мои дела",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.left,
-                    ),
-                  )),
-              SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.18,
-                        ),
-                        Text(
-                          "Выполнено - $numOfCheckedBoxes",
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                            onPressed: () =>
-                                dataProvider.changeVisibilityOfCompletedTasks,
-                            icon: Icon(
-                              (showUncompletedTasks
-                                  ? Icons.visibility_off
-                                  : Icons.visibility),
-                              color: Colors.blue,
-                            )),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.04,
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
+              ...CustomAppBar(),
               SliverList(
                   delegate: SliverChildListDelegate([
                 Container(
@@ -135,44 +86,8 @@ class MainPage extends StatelessWidget {
                       color: Colors.white),
                   child: Column(
                     children: [
-                      ListView.builder(
-                        padding: const EdgeInsets.all(1),
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          TaskModel task = listOfShowedTasks[index];
-                          return _DismissibleTask(task, index, dataProvider);
-                        },
-                        itemCount: listOfShowedTasks.length,
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          TaskModel? taskToAdd = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const EditTaskPage()));
-                          if (taskToAdd != null) {
-                            dataProvider.createTask(taskToAdd);
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            const Expanded(flex: 1, child: SizedBox()),
-                            Expanded(
-                              flex: 7,
-                              child: Container(
-                                height: 30,
-                                margin: const EdgeInsets.all(8),
-                                child: const Text(
-                                  "Новое...",
-                                  style: TextStyle(
-                                      color: Colors.grey, fontSize: 16),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
+                      TaskListBuilder(),
+                      NewTaskTile(),
                     ],
                   ),
                 ),
@@ -185,27 +100,131 @@ class MainPage extends StatelessWidget {
             return Placeholder();
           }
         }),
-      );
-    });
+      ),
+    );
   }
 
-  Widget _DismissibleTask(
-      TaskModel task, int index, MainPageDataProvider dataProvider) {
+  Widget TaskListBuilder() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(1),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        TaskModel task = listOfShowedTasks[index];
+        return _DismissibleTask(task, index, context);
+      },
+      itemCount: listOfShowedTasks.length,
+    );
+  }
+
+  Widget NewTaskTile() {
+    return InkWell(
+      onTap: () async {
+        TaskModel? taskToAdd = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const EditTaskPage()));
+        if (taskToAdd != null) {
+          bloc.add(AddTaskEvent(taskToAdd));
+        }
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const Expanded(flex: 1, child: SizedBox()),
+          Expanded(
+            flex: 7,
+            child: Container(
+              height: 30,
+              margin: const EdgeInsets.all(8),
+              child: const Text(
+                "Новое...",
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  List<Widget> CustomAppBar() {
+    return [
+      const SliverAppBar(
+          backgroundColor: Color(0xfff7f6f2),
+          pinned: true,
+          snap: false,
+          floating: true,
+          expandedHeight: 140,
+          flexibleSpace: FlexibleSpaceBar(
+            title: Text(
+              "Мои дела",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold),
+              textAlign: TextAlign.left,
+            ),
+          )),
+      SliverToBoxAdapter(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.18,
+                ),
+                Text(
+                  "Выполнено - $numOfCheckedBoxes",
+                  style: const TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () => setState(() {
+                          showUncompletedTasks = !showUncompletedTasks;
+                        }),
+                    icon: Icon(
+                      (showUncompletedTasks
+                          ? Icons.visibility_off
+                          : Icons.visibility),
+                      color: Colors.blue,
+                    )),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.04,
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    ];
+  }
+
+  Widget _DismissibleTask(TaskModel task, int index, BuildContext context) {
     return Dismissible(
         key: ValueKey(task.id),
         confirmDismiss: (direction) {
           if (direction == DismissDirection.startToEnd) {
-            dataProvider.completeTask(task);
-
+            bool newIsDone = !task.isDone;
+            setState(() {
+              // print(listOfTasks);
+              task = task.copyWith(isDone: newIsDone);
+              // print(listOfTasks);
+            });
+            context
+                .read<TaskListBloc>()
+                .add(UpdateTaskEvent(task.copyWith(isDone: newIsDone)));
             return Future.value(false);
           }
           return Future.value(true);
         },
         onDismissed: (DismissDirection direction) {
           if (direction == DismissDirection.endToStart) {
-            dataProvider.deleteTaskBySwipe(task.id);
+            bloc.add(DeleteTaskEvent(task));
           } else {
-            dataProvider.completeTask(task);
+            bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
           }
         },
         background: Container(
@@ -243,7 +262,7 @@ class MainPage extends StatelessWidget {
         child: CheckboxLine(
             task: task,
             onChanged: (bool? value) {
-              dataProvider.completeTask(task);
+              bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
             }));
   }
 }

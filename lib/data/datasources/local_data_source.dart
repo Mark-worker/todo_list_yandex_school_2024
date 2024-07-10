@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 
@@ -13,6 +13,10 @@ class LocalDataSource implements IDataSource {
   List<TaskModel> _currentListOfTasks = [];
 
   List<TaskModel> get currentListOfTasks => _currentListOfTasks;
+
+  Future<bool> hasConnection() async {
+    return await InternetConnectionChecker().hasConnection;
+  }
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
@@ -53,7 +57,6 @@ class LocalDataSource implements IDataSource {
       return [];
     }
     final List<dynamic> tasksJson = jsonDecode(tasksString);
-    logger.d(tasksJson);
     final List<TaskModel> tasks =
         tasksJson.map((json) => TaskModel.fromMap(json)).toList();
     tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -79,6 +82,9 @@ class LocalDataSource implements IDataSource {
     final String tasksString =
         jsonEncode(tasks.map((task) => task.toMap()).toList());
     await prefs.setString(_tasksKey, tasksString);
+    if (await hasConnection()) {
+      // setLocalRevision(revision);
+    }
   }
 
   Future<int> getLocalRevision() async {

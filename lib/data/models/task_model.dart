@@ -1,8 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
-
 class TaskModel {
   final String id;
   final String text;
@@ -40,7 +37,11 @@ class TaskModel {
       id: id ?? this.id,
       text: text ?? this.text,
       priority: priority ?? this.priority,
-      deadline: deadline ?? this.deadline,
+      deadline: deadline == null
+          ? this.deadline
+          : (deadline.millisecondsSinceEpoch == 0)
+              ? null
+              : deadline,
       isDone: isDone ?? this.isDone,
       hexColor: hexColor ?? this.hexColor,
       createdAt: createdAt ?? this.createdAt,

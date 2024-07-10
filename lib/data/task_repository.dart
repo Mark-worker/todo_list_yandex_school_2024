@@ -26,10 +26,9 @@ class TaskRepository implements ITaskRepository {
   }
 
   @override
-  Future<void> addTask(TaskModel task) async {
+  Future<TaskModel> addTask(TaskModel task) async {
     try {
-      await _proxyDataSource.addTask(task);
-      _currentListOfTasks.add(task);
+      return await _proxyDataSource.addTask(task);
     } catch (e) {
       rethrow;
     }
@@ -45,18 +44,18 @@ class TaskRepository implements ITaskRepository {
   }
 
   @override
-  Future<void> deleteTask(String taskId) async {
+  Future<TaskModel> deleteTask(String taskId) async {
     try {
-      await _proxyDataSource.deleteTask(taskId);
+      return await _proxyDataSource.deleteTask(taskId);
     } catch (e) {
       rethrow;
     }
   }
 
   @override
-  Future<void> changeTask(TaskModel task) async {
+  Future<TaskModel> changeTask(TaskModel task) async {
     try {
-      await _proxyDataSource.changeTask(task);
+      return await _proxyDataSource.changeTask(task);
     } catch (e) {
       rethrow;
     }

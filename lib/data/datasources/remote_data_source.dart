@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
 import 'dart:convert';
 
@@ -12,6 +11,8 @@ class RemoteDataSource implements IDataSource {
   int? _revision = 0;
   List<TaskModel> _currentListOfTasks = [];
 
+  int? get revision => _revision;
+
   @override
   RemoteDataSource(this._dio);
 
@@ -21,7 +22,6 @@ class RemoteDataSource implements IDataSource {
     final response = await _dio.get('$_baseUrl/list');
     if (response.statusCode == 200) {
       final data = response.data;
-      logger.d(data);
       _revision = data["revision"];
       final currentListOfTasks = (data['list'] as List)
           .map((task) => TaskModel.fromMap(task))
@@ -36,9 +36,6 @@ class RemoteDataSource implements IDataSource {
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
-    logger.d(
-      jsonEncode({"element": task.toMap()}),
-    );
     final response = await _dio.post(
       '$_baseUrl/list',
       data: jsonEncode({"element": task.toMap()}),
@@ -87,14 +84,21 @@ class RemoteDataSource implements IDataSource {
 
   @override
   Future<TaskModel> deleteTask(String taskId) async {
-    final response = await _dio.delete('$_baseUrl/list/$taskId');
+    final response = await _dio.delete(
+      '$_baseUrl/list/$taskId',
+      options: Options(headers: {
+        'Content-Type': 'application/json',
+        'X-Last-Known-Revision': _revision.toString()
+      }),
+    );
     if (response.statusCode == 200) {
-      for (int i = 0; i < _currentListOfTasks.length; i++) {
-        final task = _currentListOfTasks[i];
-        if (task.id == taskId) {
-          _currentListOfTasks.remove(task);
-        }
-      }
+      // for (int i = 0; i < _currentListOfTasks.length; i++) {
+      //   final task = _currentListOfTasks[i];
+      //   if (task.id == taskId) {
+      //     _currentListOfTasks.remove(task);
+      //   }
+      // }
+      _revision = response.data["revision"]++;
       final task =
           TaskModel.fromMap(response.data["element"] as Map<String, dynamic>);
       return task;
@@ -105,7 +109,6 @@ class RemoteDataSource implements IDataSource {
 
   @override
   Future<TaskModel> changeTask(TaskModel task) async {
-    final thisTask = task;
     final response = await _dio.put(
       '$_baseUrl/list/${task.id}',
       data: jsonEncode({"element": task.toMap()}),
@@ -116,9 +119,6 @@ class RemoteDataSource implements IDataSource {
     );
     if (response.statusCode == 200) {
       _revision = response.data["revision"];
-      final taskId =
-          _currentListOfTasks.indexWhere((elem) => elem.id == thisTask.id);
-      _currentListOfTasks[taskId] = thisTask;
       final task =
           TaskModel.fromMap(response.data["element"] as Map<String, dynamic>);
       return task;
