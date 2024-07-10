@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
