@@ -75,7 +75,8 @@ class _MainPageState extends State<MainPage> {
             // }
             // return TaskListBuilder();
           } else if (state is LoadedState && state.listOfTasks.isEmpty) {
-            return Center(
+            return SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
                 child: Text(AppLocalizations.of(context)!.noTasksAvailable));
           } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
             listOfTasks = state.listOfTasks;
@@ -103,8 +104,16 @@ class _MainPageState extends State<MainPage> {
             ]);
           } else if (state is ErrorState) {
             logger.e(state.exception);
-            return Center(
-                child: Text(AppLocalizations.of(context)!.errorMessage));
+            return SafeArea(
+                child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                        child:
+                            Text(AppLocalizations.of(context)!.errorMessage)))
+              ],
+            ));
           } else {
             return Placeholder();
           }
