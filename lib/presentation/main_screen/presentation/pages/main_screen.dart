@@ -70,14 +70,18 @@ class _MainPageState extends State<MainPage> {
           if (state is EmptyState || state is LoadingState) {
             return Center(child: CircularProgressIndicator());
           } else if (state is LoadingState) {
-            // if (state.isFirstFetch) {
             return Center(child: CircularProgressIndicator());
-            // }
-            // return TaskListBuilder();
           } else if (state is LoadedState && state.listOfTasks.isEmpty) {
-            return SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
-                child: Text(AppLocalizations.of(context)!.noTasksAvailable));
+            return SafeArea(
+                child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                        child: Text(
+                            AppLocalizations.of(context)!.noTasksAvailable)))
+              ],
+            ));
           } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
             listOfTasks = state.listOfTasks;
             _updateTaskList();
