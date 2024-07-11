@@ -8,13 +8,13 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   final ITaskRepository taskRepository;
 
   TaskListBloc(this.taskRepository) : super(EmptyState()) {
-    on<FetchDataEvent>((event, emit) => _fetchData(emit));
+    on<FetchDataEvent>((event, emit) => _fetchData(event, emit));
     on<UpdateTaskEvent>((event, emit) => _updateTask(event, emit));
     on<AddTaskEvent>((event, emit) => _addTask(event, emit));
     on<DeleteTaskEvent>((event, emit) => _deleteTask(event, emit));
   }
 
-  void _fetchData(Emitter<TaskListState> emit) async {
+  void _fetchData(FetchDataEvent event, Emitter<TaskListState> emit) async {
     if (state is LoadingState) return;
     try {
       final currentState = state;
@@ -23,7 +23,8 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         oldTasksList = currentState.listOfTasks;
       }
       emit(LoadingState(oldTasksList, isFirstFetch: oldTasksList != []));
-      List<TaskModel> updatedTasks = await taskRepository.getAllTasks();
+      List<TaskModel> updatedTasks =
+          await taskRepository.getAllTasks(event.firstLaunch);
       emit(LoadedState(updatedTasks));
     } catch (e) {
       emit(ErrorState(e.toString()));

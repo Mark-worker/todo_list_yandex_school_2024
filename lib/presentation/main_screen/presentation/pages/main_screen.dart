@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
+import 'package:todo_list_yandex_school_2024/data/datasources/local_data_source.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
@@ -8,6 +9,7 @@ import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_sta
 import 'package:todo_list_yandex_school_2024/presentation/edit_task_screen/edit_task_screen.dart';
 import 'package:todo_list_yandex_school_2024/presentation/main_screen/presentation/widgets/checkbox_line.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:todo_list_yandex_school_2024/service_locator.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({super.key});
@@ -61,8 +63,8 @@ class _MainPageState extends State<MainPage> {
           )),
       body: RefreshIndicator(
         edgeOffset: 140,
-        onRefresh: () async =>
-            context.read<TaskListBloc>().add(FetchDataEvent()),
+        onRefresh: () async => context.read<TaskListBloc>().add(FetchDataEvent(
+            firstLaunch: getIt<LocalDataSource>().currentListOfTasks.isEmpty)),
         child:
             BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
           if (state is EmptyState || state is LoadingState) {

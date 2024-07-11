@@ -17,7 +17,7 @@ class RemoteDataSource implements IDataSource {
   RemoteDataSource(this._dio);
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
+  Future<List<TaskModel>> getAllTasks(bool _) async {
     _dio.options.headers["Authorization"] = "Bearer $bearerToken";
     final response = await _dio.get('$_baseUrl/list');
     if (response.statusCode == 200) {

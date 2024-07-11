@@ -2,7 +2,11 @@ import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 
 sealed class TaskListEvent {}
 
-class FetchDataEvent extends TaskListEvent {}
+class FetchDataEvent extends TaskListEvent {
+  final bool firstLaunch;
+
+  FetchDataEvent({this.firstLaunch = false});
+}
 
 class UpdateTaskEvent extends TaskListEvent {
   final TaskModel task;

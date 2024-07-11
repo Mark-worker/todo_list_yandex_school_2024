@@ -54,7 +54,7 @@ class LocalDataSource implements IDataSource {
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
+  Future<List<TaskModel>> getAllTasks(bool _) async {
     final prefs = await _prefs;
     final tasksString = prefs.getString(_tasksKey);
     if (tasksString == null) {

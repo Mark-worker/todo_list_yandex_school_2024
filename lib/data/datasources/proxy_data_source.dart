@@ -21,23 +21,24 @@ class ProxyDataSource implements IDataSource {
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
+  Future<List<TaskModel>> getAllTasks(bool firstLaunch) async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
-      List<TaskModel> tasks = await _remoteDataSource.getAllTasks();
+      List<TaskModel> tasks = await _remoteDataSource.getAllTasks(firstLaunch);
       int currentLocalRevision = await _localDataSource.getLocalRevision();
       int currentRemoteRevision = _remoteDataSource.revision!;
       logger.d(
           "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}");
-      if (currentLocalRevision != currentRemoteRevision) {
+      if (currentLocalRevision != currentRemoteRevision && !firstLaunch) {
         logger.d("different revisions! merging lists...");
+        logger.d(await _localDataSource.getAllTasks(firstLaunch));
         tasks = await _remoteDataSource
-            .updateTasks(await _localDataSource.getAllTasks());
+            .updateTasks(await _localDataSource.getAllTasks(firstLaunch));
       }
       _localDataSource.saveTasks(tasks);
       _localDataSource.setLocalRevision(_remoteDataSource.revision!);
     }
-    return await _localDataSource.getAllTasks();
+    return await _localDataSource.getAllTasks(firstLaunch);
   }
 
   @override

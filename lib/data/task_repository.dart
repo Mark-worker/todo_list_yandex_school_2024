@@ -16,9 +16,9 @@ class TaskRepository implements ITaskRepository {
   List<TaskModel> get listOfTasks => _proxyDataSource.listOfTasks;
 
   @override
-  Future<List<TaskModel>> getAllTasks() async {
+  Future<List<TaskModel>> getAllTasks(bool firstLaunch) async {
     try {
-      _currentListOfTasks = await _proxyDataSource.getAllTasks();
+      _currentListOfTasks = await _proxyDataSource.getAllTasks(firstLaunch);
       return _currentListOfTasks;
     } catch (e) {
       rethrow;

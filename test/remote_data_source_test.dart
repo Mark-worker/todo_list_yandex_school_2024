@@ -52,7 +52,7 @@ void main() {
         ),
       );
 
-      final tasks = await remoteDataSource.getAllTasks();
+      final tasks = await remoteDataSource.getAllTasks(false);
 
       expect(tasks, isA<List<TaskModel>>());
       expect(tasks.length, 2);
