@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
@@ -98,6 +99,10 @@ class _MainPageState extends State<MainPage> {
                 )
               ]))
             ]);
+          } else if (state is ErrorState) {
+            logger.e(state.exception);
+            return Center(
+                child: Text(AppLocalizations.of(context)!.errorMessage));
           } else {
             return Placeholder();
           }

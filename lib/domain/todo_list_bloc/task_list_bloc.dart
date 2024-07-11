@@ -31,34 +31,42 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   void _updateTask(UpdateTaskEvent event, Emitter<TaskListState> emit) async {
-    print("started to update task");
     final TaskModel task = event.task;
-    final TaskModel changedTask = await taskRepository.changeTask(task);
-    print("changed task");
-    final List<TaskModel> updatedTasks = (state as LoadedState)
-        .listOfTasks
-        .map((task) => task.id == changedTask.id ? changedTask : task)
-        .toList();
-    print("created updated list of tasks");
-    emit(LoadedState(updatedTasks));
-    print("emitted state");
+    try {
+      final TaskModel changedTask = await taskRepository.changeTask(task);
+      final List<TaskModel> updatedTasks = (state as LoadedState)
+          .listOfTasks
+          .map((task) => task.id == changedTask.id ? changedTask : task)
+          .toList();
+      emit(LoadedState(updatedTasks));
+    } catch (e) {
+      emit(ErrorState(e.toString()));
+    }
   }
 
   void _addTask(AddTaskEvent event, Emitter<TaskListState> emit) async {
     final TaskModel task = event.task;
-    final TaskModel addedTask = await taskRepository.addTask(task);
-    final List<TaskModel> updatedTasks = (state as LoadedState).listOfTasks
-      ..add(addedTask);
-    emit(LoadedState(updatedTasks));
+    try {
+      final TaskModel addedTask = await taskRepository.addTask(task);
+      final List<TaskModel> updatedTasks = (state as LoadedState).listOfTasks
+        ..add(addedTask);
+      emit(LoadedState(updatedTasks));
+    } catch (e) {
+      emit(ErrorState(e.toString()));
+    }
   }
 
   void _deleteTask(DeleteTaskEvent event, Emitter<TaskListState> emit) async {
     final TaskModel task = event.task;
-    final TaskModel deletedTask = await taskRepository.deleteTask(task.id);
-    final updatedTasks = (state as LoadedState)
-        .listOfTasks
-        .where((t) => t.id != deletedTask.id)
-        .toList();
-    emit(LoadedState(updatedTasks));
+    try {
+      final TaskModel deletedTask = await taskRepository.deleteTask(task.id);
+      final updatedTasks = (state as LoadedState)
+          .listOfTasks
+          .where((t) => t.id != deletedTask.id)
+          .toList();
+      emit(LoadedState(updatedTasks));
+    } catch (e) {
+      emit(ErrorState(e.toString()));
+    }
   }
 }

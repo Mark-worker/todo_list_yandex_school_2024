@@ -25,10 +25,11 @@ class ProxyDataSource implements IDataSource {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
       List<TaskModel> tasks = await _remoteDataSource.getAllTasks();
+      int currentLocalRevision = await _localDataSource.getLocalRevision();
+      int currentRemoteRevision = _remoteDataSource.revision!;
       logger.d(
           "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}");
-      if ((await _localDataSource.getLocalRevision()) !=
-          _remoteDataSource.revision) {
+      if (currentLocalRevision != currentRemoteRevision) {
         logger.d("different revisions! merging lists...");
         tasks = await _remoteDataSource
             .updateTasks(await _localDataSource.getAllTasks());

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
 import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
 
@@ -20,9 +21,9 @@ class LocalDataSource implements IDataSource {
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
-    final tasks = _currentListOfTasks;
-    tasks.add(task);
-    await saveTasks(tasks);
+    _currentListOfTasks.add(task);
+    await saveTasks(_currentListOfTasks);
+    setLocalRevision((await getLocalRevision()) + 1);
     return task;
   }
 
@@ -30,8 +31,10 @@ class LocalDataSource implements IDataSource {
   Future<TaskModel> changeTask(TaskModel task) async {
     final tasks = _currentListOfTasks;
     final taskId = tasks.indexWhere((elem) => elem.id == task.id);
+    logger.d(taskId);
     tasks[taskId] = task;
     await saveTasks(tasks);
+    setLocalRevision((await getLocalRevision()) + 1);
     return task;
   }
 
@@ -46,6 +49,7 @@ class LocalDataSource implements IDataSource {
         return task;
       }
     }
+    setLocalRevision((await getLocalRevision()) + 1);
     throw Exception("Couldn't delete task from local repository");
   }
 
@@ -60,6 +64,7 @@ class LocalDataSource implements IDataSource {
     final List<TaskModel> tasks =
         tasksJson.map((json) => TaskModel.fromMap(json)).toList();
     tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    _currentListOfTasks = List.from(tasks);
     return tasks;
   }
 
@@ -73,18 +78,16 @@ class LocalDataSource implements IDataSource {
   @override
   Future<List<TaskModel>> updateTasks(List<TaskModel> tasks) async {
     await saveTasks(tasks);
+    _currentListOfTasks = tasks;
+    setLocalRevision((await getLocalRevision()) + 1);
     return _currentListOfTasks;
   }
 
   Future<void> saveTasks(List<TaskModel> tasks) async {
-    _currentListOfTasks = tasks;
     final prefs = await _prefs;
     final String tasksString =
         jsonEncode(tasks.map((task) => task.toMap()).toList());
     await prefs.setString(_tasksKey, tasksString);
-    if (await hasConnection()) {
-      // setLocalRevision(revision);
-    }
   }
 
   Future<int> getLocalRevision() async {

@@ -23,6 +23,10 @@
     "@noTasksAvailable": {
         "description": "Text that appears at the center of the screen in case user doesn't have any tasks"
     },
+    "errorMessage": "Oops! Something went wrong... Come here later!",
+    "@errorMessage" : {
+        "description": "Message that is shown at the main screen in case some exception was thrown"
+    },
     "saveButton": "Save",
     "@saveButton": {
         "description": "Title of the button that allows you to save your task at the edit page"
