@@ -10,7 +10,7 @@ class LocalDataSource implements IDataSource {
   static const String _tasksKey = 'tasks_key';
   static const String _revisionKey = 'revision_key';
 
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   List<TaskModel> _currentListOfTasks = [];
 
   List<TaskModel> get currentListOfTasks => _currentListOfTasks;
@@ -30,6 +30,11 @@ class LocalDataSource implements IDataSource {
   @override
   Future<TaskModel> changeTask(TaskModel task) async {
     final tasks = _currentListOfTasks;
+    logger.d(tasks);
+    logger.d(task.id);
+    for (TaskModel element in tasks) {
+      logger.d(element.id);
+    }
     final taskId = tasks.indexWhere((elem) => elem.id == task.id);
     logger.d(taskId);
     tasks[taskId] = task;
@@ -61,17 +66,19 @@ class LocalDataSource implements IDataSource {
       return [];
     }
     final List<dynamic> tasksJson = jsonDecode(tasksString);
-    final List<TaskModel> tasks =
+    _currentListOfTasks =
         tasksJson.map((json) => TaskModel.fromMap(json)).toList();
-    tasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    _currentListOfTasks = List.from(tasks);
-    return tasks;
+    for (TaskModel elem in _currentListOfTasks) {
+      logger.d(elem.toMap());
+    }
+    _currentListOfTasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    return _currentListOfTasks;
   }
 
   @override
   Future<TaskModel> getTask(String taskId) async {
-    final List<TaskModel> tasks = _currentListOfTasks;
-    final TaskModel task = tasks.where((elem) => elem.id == taskId).first;
+    final TaskModel task =
+        _currentListOfTasks.where((elem) => elem.id == taskId).first;
     return task;
   }
 

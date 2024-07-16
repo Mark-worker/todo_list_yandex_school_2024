@@ -230,14 +230,14 @@ class _MainPageState extends State<MainPage> {
         confirmDismiss: (direction) {
           if (direction == DismissDirection.startToEnd) {
             bool newIsDone = !task.isDone;
+            TaskModel updatedTask =
+                task.copyWith(isDone: newIsDone, changedAt: DateTime.now());
             setState(() {
               // print(listOfTasks);
-              task = task.copyWith(isDone: newIsDone);
+              task = updatedTask;
               // print(listOfTasks);
             });
-            context
-                .read<TaskListBloc>()
-                .add(UpdateTaskEvent(task.copyWith(isDone: newIsDone)));
+            bloc.add(UpdateTaskEvent(updatedTask));
             return Future.value(false);
           }
           return Future.value(true);
@@ -246,7 +246,8 @@ class _MainPageState extends State<MainPage> {
           if (direction == DismissDirection.endToStart) {
             bloc.add(DeleteTaskEvent(task));
           } else {
-            bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
+            bloc.add(UpdateTaskEvent(task.copyWith(
+                isDone: !task.isDone, changedAt: DateTime.now())));
           }
         },
         background: Container(
@@ -284,7 +285,8 @@ class _MainPageState extends State<MainPage> {
         child: CheckboxLine(
             task: task,
             onChanged: (bool? value) {
-              bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
+              bloc.add(UpdateTaskEvent(task.copyWith(
+                  isDone: !task.isDone, changedAt: DateTime.now())));
             }));
   }
 }
