@@ -59,7 +59,7 @@ class LocalDataSource implements IDataSource {
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks(bool _) async {
+  Future<List<TaskModel>> getAllTasks() async {
     final prefs = await _prefs;
     final tasksString = prefs.getString(_tasksKey);
     if (tasksString == null) {
@@ -68,9 +68,9 @@ class LocalDataSource implements IDataSource {
     final List<dynamic> tasksJson = jsonDecode(tasksString);
     _currentListOfTasks =
         tasksJson.map((json) => TaskModel.fromMap(json)).toList();
-    for (TaskModel elem in _currentListOfTasks) {
-      logger.d(elem.toMap());
-    }
+    // for (TaskModel elem in _currentListOfTasks) {
+    //   logger.d(elem.toMap());
+    // }
     _currentListOfTasks.sort((a, b) => a.createdAt.compareTo(b.createdAt));
     return _currentListOfTasks;
   }

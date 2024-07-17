@@ -31,7 +31,7 @@ class RemoteDataSource implements IDataSource {
   RemoteDataSource();
 
   @override
-  Future<List<TaskModel>> getAllTasks(bool _) async {
+  Future<List<TaskModel>> getAllTasks() async {
     final response = await _dio.get("/list");
     if (response.statusCode == 200) {
       final data = response.data;

@@ -21,24 +21,25 @@ class TaskRepository implements ITaskRepository {
   }
 
   @override
-  Future<List<TaskModel>> getAllTasks(bool firstLaunch) async {
+  Future<List<TaskModel>> getAllTasks() async {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
-      List<TaskModel> tasks = await _remoteDataSource.getAllTasks(firstLaunch);
+      List<TaskModel> tasks = await _remoteDataSource.getAllTasks();
       int currentLocalRevision = await _localDataSource.getLocalRevision();
       int currentRemoteRevision = _remoteDataSource.revision!;
       logger.d(
           "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}");
-      if (currentLocalRevision != currentRemoteRevision && !firstLaunch) {
+      if ((currentLocalRevision != currentRemoteRevision) && (currentLocalRevision != 0)) {
         logger.d("different revisions! merging lists...");
-        logger.d(await _localDataSource.getAllTasks(firstLaunch));
+        logger.d(await _localDataSource.getAllTasks());
         tasks = await _remoteDataSource
-            .updateTasks(await _localDataSource.getAllTasks(firstLaunch));
+            .updateTasks(await _localDataSource.getAllTasks());
       }
+      logger.d(tasks);
       _localDataSource.saveTasks(tasks);
       _localDataSource.setLocalRevision(_remoteDataSource.revision!);
     }
-    return await _localDataSource.getAllTasks(firstLaunch);
+    return await _localDataSource.getAllTasks();
   }
 
   @override

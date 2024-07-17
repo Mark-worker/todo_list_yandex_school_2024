@@ -62,7 +62,7 @@ class _MainPageState extends State<MainPage> {
             color: Colors.white,
           )),
       body: RefreshIndicator(
-        edgeOffset: 140,
+        edgeOffset: 150,
         onRefresh: () async => context.read<TaskListBloc>().add(FetchDataEvent(
             firstLaunch: getIt<LocalDataSource>().currentListOfTasks.isEmpty)),
         child:
@@ -226,7 +226,7 @@ class _MainPageState extends State<MainPage> {
 
   Widget _DismissibleTask(TaskModel task, int index, BuildContext context) {
     return Dismissible(
-        key: ValueKey(task.id),
+        key: UniqueKey(),
         confirmDismiss: (direction) {
           if (direction == DismissDirection.startToEnd) {
             bool newIsDone = !task.isDone;
@@ -245,6 +245,7 @@ class _MainPageState extends State<MainPage> {
         onDismissed: (DismissDirection direction) {
           if (direction == DismissDirection.endToStart) {
             bloc.add(DeleteTaskEvent(task));
+            
           } else {
             bloc.add(UpdateTaskEvent(task.copyWith(
                 isDone: !task.isDone)));

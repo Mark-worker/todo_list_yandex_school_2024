@@ -1,5 +1,6 @@
 import "package:bloc_concurrency/bloc_concurrency.dart";
 import 'package:flutter_bloc/flutter_bloc.dart';
+import "package:todo_list_yandex_school_2024/core/logger.dart";
 import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
@@ -24,10 +25,6 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
       },
       transformer: sequential(),
     );
-    // on<FetchDataEvent>((event, emit) => _fetchData(event, emit));
-    // on<UpdateTaskEvent>((event, emit) => _updateTask(event, emit));
-    // on<AddTaskEvent>((event, emit) => _addTask(event, emit));
-    // on<DeleteTaskEvent>((event, emit) => _deleteTask(event, emit));
   }
 
   Future<void> _fetchData(
@@ -40,8 +37,7 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
         oldTasksList = currentState.listOfTasks;
       }
       emit(LoadingState(oldTasksList, isFirstFetch: oldTasksList != []));
-      List<TaskModel> updatedTasks =
-          await taskRepository.getAllTasks(event.firstLaunch);
+      List<TaskModel> updatedTasks = await taskRepository.getAllTasks();
       emit(LoadedState(updatedTasks));
     } catch (e) {
       emit(ErrorState(e.toString()));
@@ -65,16 +61,19 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   Future<void> _addTask(AddTaskEvent event, Emitter<TaskListState> emit) async {
-    // logger.d(
-    //     "length of list before adding a task: ${(state as LoadedState).listOfTasks.length}");
+    logger.d(
+        "length of list before adding a task: ${(state as LoadedState).listOfTasks.length}");
+    // await Future.delayed(Duration(seconds: 5));
+    logger.d(
+        "length of list after 5 seconds: ${(state as LoadedState).listOfTasks.length}");
     final TaskModel task = event.task;
     try {
-      final TaskModel addedTask = await taskRepository.addTask(task);
-      // logger.d(
-      //     "length of list after completing of addition a task: ${(state as LoadedState).listOfTasks.length}");
-      final List<TaskModel> updatedTasks = (state as LoadedState).listOfTasks
-        ..add(addedTask);
-      // logger.d("length of list after adding a task: ${updatedTasks.length}");j
+      await taskRepository.addTask(task);
+      logger.d(
+          "length of list after completing of addition a task: ${(state as LoadedState).listOfTasks.length}");
+      final List<TaskModel> updatedTasks = (state as LoadedState).listOfTasks;
+      // ..add(addedTask);
+      logger.d("length of list after adding a task: ${updatedTasks.length}");
       emit(LoadedState(updatedTasks));
     } catch (e) {
       emit(ErrorState(e.toString()));
