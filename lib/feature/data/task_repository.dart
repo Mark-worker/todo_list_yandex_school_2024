@@ -1,15 +1,15 @@
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/local_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/remote_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart';
 
-class ProxyDataSource implements IDataSource {
+class TaskRepository implements ITaskRepository {
   final LocalDataSource _localDataSource;
   final RemoteDataSource _remoteDataSource;
 
-  ProxyDataSource(this._localDataSource, this._remoteDataSource);
+  TaskRepository(this._localDataSource, this._remoteDataSource);
 
   List<TaskModel> get listOfTasks {
     return _localDataSource.currentListOfTasks;
@@ -25,14 +25,17 @@ class ProxyDataSource implements IDataSource {
     bool hasConnection = await InternetConnectionChecker().hasConnection;
     if (hasConnection) {
       List<TaskModel> tasks = await _remoteDataSource.getAllTasks();
+      int currentLocalRevision = await _localDataSource.getLocalRevision();
+      int currentRemoteRevision = _remoteDataSource.revision!;
       logger.d(
           "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}");
-      if ((await _localDataSource.getLocalRevision()) !=
-          _remoteDataSource.revision) {
+      if ((currentLocalRevision != currentRemoteRevision) && (currentLocalRevision != 0)) {
         logger.d("different revisions! merging lists...");
+        logger.d(await _localDataSource.getAllTasks());
         tasks = await _remoteDataSource
             .updateTasks(await _localDataSource.getAllTasks());
       }
+      logger.d(tasks);
       _localDataSource.saveTasks(tasks);
       _localDataSource.setLocalRevision(_remoteDataSource.revision!);
     }

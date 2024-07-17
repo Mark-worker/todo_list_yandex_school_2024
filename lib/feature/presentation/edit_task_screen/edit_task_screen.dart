@@ -2,9 +2,9 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_bloc.dart';
-import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -70,7 +70,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                           await _getPhoneId(context.read<DeviceInfoPlugin>()));
                   Navigator.pop(context, taskToChange);
                 } else {
-                  final taskToSave = await _createTask(
+                  final taskToSave = await _formTask(
                       context.read<Uuid>(), context.read<DeviceInfoPlugin>());
                   Navigator.pop(context, taskToSave);
                 }
@@ -114,7 +114,9 @@ class _EditTaskPageState extends State<EditTaskPage> {
                           width: 100,
                           child: Text(value,
                               style: TextStyle(
-                                  color: value != AppLocalizations.of(context)!.highImportance
+                                  color: value !=
+                                          AppLocalizations.of(context)!
+                                              .highImportance
                                       ? Colors.black
                                       : Colors.red,
                                   fontWeight: FontWeight.w400,
@@ -160,7 +162,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       ),
                       if (selectedDate != null)
                         Text(
-                          formatDate(selectedDate!, AppLocalizations.of(context)!.languageCode),
+                          formatDate(selectedDate!,
+                              AppLocalizations.of(context)!.languageCode),
                           style:
                               const TextStyle(color: Colors.blue, fontSize: 14),
                         )
@@ -291,7 +294,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
     );
   }
 
-  Future<TaskModel> _createTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
+  Future<TaskModel> _formTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
     return TaskModel(
         id: uuid.v1(),
         text: _controller.text,

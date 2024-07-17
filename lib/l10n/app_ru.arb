@@ -5,6 +5,7 @@
     "howMuchDone": "Выполнено",
     "newTask": "Новое...",
     "noTasksAvailable": "У вас нет назначенных задач. Создайте задачу, нажав '+'",
+    "errorMessage": "Ой! Что-то пошло не так... Возвращайтесь позже!",
     "saveButton": "Сохранить",
     "textFieldHint": "Что надо сделать...",
     "importanceTitle": "Важность",

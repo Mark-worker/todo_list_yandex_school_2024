@@ -103,14 +103,6 @@ enum TaskPriority {
   low,
   high;
 
-  // String get toNameString {
-  //   return switch (this) {
-  //     TaskPriority.none => "Нет",
-  //     TaskPriority.low => "Низкий",
-  //     TaskPriority.high => "!! Высокий",
-  //   };
-  // }
-
   String get toJson {
     return switch (this) {
       TaskPriority.none => "low",
