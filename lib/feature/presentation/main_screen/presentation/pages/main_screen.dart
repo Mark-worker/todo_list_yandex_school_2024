@@ -231,7 +231,7 @@ class _MainPageState extends State<MainPage> {
           if (direction == DismissDirection.startToEnd) {
             bool newIsDone = !task.isDone;
             TaskModel updatedTask =
-                task.copyWith(isDone: newIsDone, changedAt: DateTime.now());
+                task.copyWith(isDone: newIsDone);
             setState(() {
               // print(listOfTasks);
               task = updatedTask;
@@ -247,7 +247,7 @@ class _MainPageState extends State<MainPage> {
             bloc.add(DeleteTaskEvent(task));
           } else {
             bloc.add(UpdateTaskEvent(task.copyWith(
-                isDone: !task.isDone, changedAt: DateTime.now())));
+                isDone: !task.isDone)));
           }
         },
         background: Container(
@@ -286,7 +286,7 @@ class _MainPageState extends State<MainPage> {
             task: task,
             onChanged: (bool? value) {
               bloc.add(UpdateTaskEvent(task.copyWith(
-                  isDone: !task.isDone, changedAt: DateTime.now())));
+                  isDone: !task.isDone)));
             }));
   }
 }
