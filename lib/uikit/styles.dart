@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
 class Styles {
-  final TextStyle LargeTitleStyle = TextStyle(
+  final TextStyle largeTitleStyle = const TextStyle(
     fontSize: 32,
     height: 38 / 32,
     fontWeight: FontWeight.bold,
     fontFamily: "Roboto",
   );
-  final TextStyle TitleStyle = TextStyle(
+  final TextStyle titleStyle = const TextStyle(
     fontSize: 20,
     height: 32 / 20,
     fontWeight: FontWeight.bold,
     fontFamily: "Roboto",
   );
-  final ButtonStyle = TextStyle(
+  final buttonStyle = const TextStyle(
     fontSize: 14,
     height: 24 / 14,
     fontWeight: FontWeight.bold,
     fontFamily: "Roboto",
   );
-  final TextStyle BodyStyle = TextStyle(
+  final TextStyle bodyStyle = const TextStyle(
     fontSize: 16,
     height: 20 / 16,
     fontFamily: "Roboto",
   );
-  final TextStyle SubheadStyle = TextStyle(
+  final TextStyle subheadStyle = const TextStyle(
     fontSize: 14,
     height: 20 / 14,
     fontFamily: "Roboto",
