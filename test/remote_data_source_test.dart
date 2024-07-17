@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
-import 'package:dio/dio.dart';
-import 'mocks.mocks.dart';
+import "package:flutter_test/flutter_test.dart";
+import "package:mockito/mockito.dart";
+import "package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart";
+import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
+import "package:dio/dio.dart";
+import "mocks.mocks.dart";
 
 void main() {
   late RemoteDataSource remoteDataSource;
@@ -14,11 +14,11 @@ void main() {
     mockDio = MockDio();
     mockOptions = BaseOptions();
     when(mockDio.options).thenReturn(mockOptions);
-    remoteDataSource = RemoteDataSource(mockDio);
+    remoteDataSource = RemoteDataSource();
   });
 
-  group('RemoteDataSource Tests', () {
-    test('getAllTasks returns list of TaskModel', () async {
+  group("RemoteDataSource Tests", () {
+    test("getAllTasks returns list of TaskModel", () async {
       final responsePayload = {
         "list": [
           {
@@ -48,7 +48,7 @@ void main() {
         (_) async => Response(
           data: responsePayload,
           statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
+          requestOptions: RequestOptions(path: ""),
         ),
       );
 
@@ -60,7 +60,7 @@ void main() {
       expect(tasks[1].text, "Second task");
     });
 
-    test('addTask returns the added TaskModel', () async {
+    test("addTask returns the added TaskModel", () async {
       final taskToAdd = TaskModel.fromMap({
         "importance": "important",
         "last_updated_by": "SE1A.220826.008",
@@ -77,12 +77,12 @@ void main() {
       };
 
       when(mockDio.post(any,
-              data: anyNamed('data'), options: anyNamed('options')))
+              data: anyNamed("data"), options: anyNamed("options")))
           .thenAnswer(
         (_) async => Response(
           data: responsePayload,
           statusCode: 200,
-          requestOptions: RequestOptions(path: ''),
+          requestOptions: RequestOptions(path: ""),
         ),
       );
 
