@@ -46,11 +46,16 @@ class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   }
 
   void _addTask(AddTaskEvent event, Emitter<TaskListState> emit) async {
+    // logger.d(
+    //     "length of list before adding a task: ${(state as LoadedState).listOfTasks.length}");
     final TaskModel task = event.task;
     try {
       final TaskModel addedTask = await taskRepository.addTask(task);
+      // logger.d(
+      //     "length of list after completing of addition a task: ${(state as LoadedState).listOfTasks.length}");
       final List<TaskModel> updatedTasks = (state as LoadedState).listOfTasks
         ..add(addedTask);
+      // logger.d("length of list after adding a task: ${updatedTasks.length}");j
       emit(LoadedState(updatedTasks));
     } catch (e) {
       emit(ErrorState(e.toString()));

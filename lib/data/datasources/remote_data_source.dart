@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
 import 'dart:convert';
 
@@ -36,6 +37,7 @@ class RemoteDataSource implements IDataSource {
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
+    logger.d("Called remote addTask");
     final response = await _dio.post(
       '$_baseUrl/list',
       data: jsonEncode({"element": task.toMap()}),

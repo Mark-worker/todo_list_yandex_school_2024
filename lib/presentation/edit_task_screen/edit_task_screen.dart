@@ -70,7 +70,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                           await _getPhoneId(context.read<DeviceInfoPlugin>()));
                   Navigator.pop(context, taskToChange);
                 } else {
-                  final taskToSave = await _createTask(
+                  final taskToSave = await _formTask(
                       context.read<Uuid>(), context.read<DeviceInfoPlugin>());
                   Navigator.pop(context, taskToSave);
                 }
@@ -291,7 +291,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
     );
   }
 
-  Future<TaskModel> _createTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
+  Future<TaskModel> _formTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
     return TaskModel(
         id: uuid.v1(),
         text: _controller.text,

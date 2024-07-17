@@ -21,9 +21,12 @@ class LocalDataSource implements IDataSource {
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
+    // logger.d("Called local addTask");
+    // logger.d("length of list of tasks before: ${_currentListOfTasks.length}");
     _currentListOfTasks.add(task);
     await saveTasks(_currentListOfTasks);
     setLocalRevision((await getLocalRevision()) + 1);
+    // logger.d("length of list of tasks after: ${_currentListOfTasks.length}");
     return task;
   }
 
