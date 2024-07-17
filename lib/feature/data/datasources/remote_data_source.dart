@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/i_data_source.dart';
 import 'dart:convert';
 
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
 
 class RemoteDataSource implements IDataSource {
   final Dio _dio;

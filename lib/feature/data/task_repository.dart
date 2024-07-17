@@ -1,9 +1,9 @@
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/local_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/remote_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/domain/i_task_repository.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart';
 
 class TaskRepository implements ITaskRepository {
   final LocalDataSource _localDataSource;

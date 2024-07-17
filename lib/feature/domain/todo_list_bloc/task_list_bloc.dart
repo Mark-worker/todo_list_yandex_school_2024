@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/domain/i_task_repository.dart';
-import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_events.dart';
-import 'package:todo_list_yandex_school_2024/domain/todo_list_bloc/task_list_states.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
+import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_states.dart';
 
 class TaskListBloc extends Bloc<TaskListEvent, TaskListState> {
   final ITaskRepository taskRepository;

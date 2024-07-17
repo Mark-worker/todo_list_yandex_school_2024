@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/data/datasources/i_data_source.dart';
-import 'package:todo_list_yandex_school_2024/data/models/task_model.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/datasources/i_data_source.dart';
+import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
 
 class LocalDataSource implements IDataSource {
   static const String _tasksKey = 'tasks_key';
@@ -21,12 +21,9 @@ class LocalDataSource implements IDataSource {
 
   @override
   Future<TaskModel> addTask(TaskModel task) async {
-    // logger.d("Called local addTask");
-    // logger.d("length of list of tasks before: ${_currentListOfTasks.length}");
     _currentListOfTasks.add(task);
     await saveTasks(_currentListOfTasks);
     setLocalRevision((await getLocalRevision()) + 1);
-    // logger.d("length of list of tasks after: ${_currentListOfTasks.length}");
     return task;
   }
 
