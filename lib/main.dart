@@ -14,10 +14,10 @@ import "package:todo_list_yandex_school_2024/routes.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
 import 'package:flutter/material.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/feature/presentation/main_screen.dart';
 import "package:todo_list_yandex_school_2024/uikit/themes.dart";
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 void main() {
   PlatformDispatcher.instance.onError = (error, stackTrace) {
@@ -47,7 +47,7 @@ class MainApp extends StatelessWidget {
       providers: [
         BlocProvider(
             create: (context) =>
-                TaskListBloc(getIt<TaskRepository>())..add(FetchDataEvent())),
+                TaskListBloc(getIt<TaskRepository>())..add(FetchDataEvent()),),
         Provider<Uuid>(create: (_) => getIt<Uuid>()),
         Provider<DeviceInfoPlugin>(create: (_) => getIt<DeviceInfoPlugin>()),
       ],
@@ -60,13 +60,13 @@ class MainApp extends StatelessWidget {
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate
+            GlobalCupertinoLocalizations.delegate,
           ],
           theme: AppThemeData.lightTheme,
           darkTheme: AppThemeData.darkTheme,
           routerDelegate:
               RoutemasterDelegate(routesBuilder: (context) => routes),
-          routeInformationParser: RoutemasterParser(),),
+          routeInformationParser: const RoutemasterParser(),),
     );
   }
 }
