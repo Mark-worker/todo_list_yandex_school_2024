@@ -12,6 +12,7 @@ import "package:todo_list_yandex_school_2024/service_locator.dart";
 import 'package:flutter/material.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
 import 'package:todo_list_yandex_school_2024/feature/presentation/main_screen/presentation/pages/main_screen.dart';
+import "package:todo_list_yandex_school_2024/uikit/themes.dart";
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -57,6 +58,8 @@ class MainApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate
           ],
+          theme: AppThemeData.lightTheme,
+          darkTheme: AppThemeData.darkTheme,
           home: MainPage()),
     );
   }

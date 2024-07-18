@@ -5,6 +5,7 @@ import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
 import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
+import "package:todo_list_yandex_school_2024/uikit/colors.dart";
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -24,6 +25,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
   late bool switcherValue;
   TaskPriority importanceValue = TaskPriority.none;
   DateTime? selectedDate;
+  late ThemeData theme;
 
   @override
   void initState() {
@@ -44,14 +46,15 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xfff7f6f2),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: const Icon(
+            icon: Icon(
               Icons.close,
-              color: Colors.black,
+              color: theme.colorScheme.onSurface,
             )),
         actions: [
           TextButton(
@@ -77,10 +80,10 @@ class _EditTaskPageState extends State<EditTaskPage> {
               },
               child: Text(
                 AppLocalizations.of(context)!.saveButton.toUpperCase(),
-                style: TextStyle(color: Colors.blue),
+                style: TextStyle(color: ColorPalette.lightColorBlue),
               ))
         ],
-        backgroundColor: const Color(0xfff7f6f2),
+        backgroundColor: theme.appBarTheme.backgroundColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -95,10 +98,11 @@ class _EditTaskPageState extends State<EditTaskPage> {
               ),
               Text(
                 AppLocalizations.of(context)!.importanceTitle,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16),
+                style: theme.textTheme.bodyMedium!
+                    .copyWith(fontWeight: FontWeight.w400),
+              ),
+              SizedBox(
+                height: 2,
               ),
               PopupMenuButton(
                 iconSize: 0,
@@ -113,14 +117,13 @@ class _EditTaskPageState extends State<EditTaskPage> {
                         child: SizedBox(
                           width: 100,
                           child: Text(value,
-                              style: TextStyle(
-                                  color: value !=
-                                          AppLocalizations.of(context)!
-                                              .highImportance
-                                      ? Colors.black
-                                      : Colors.red,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14),
+                              style: theme.textTheme.bodyMedium!.copyWith(
+                                color: value !=
+                                        AppLocalizations.of(context)!
+                                            .highImportance
+                                    ? theme.textTheme.bodyMedium!.color
+                                    : ColorPalette.lightColorRed,
+                              ),
                               textHeightBehavior: const TextHeightBehavior(
                                   applyHeightToFirstAscent: true)),
                         ));
@@ -134,8 +137,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       style: TextStyle(
                           color: importanceToString(importanceValue) !=
                                   AppLocalizations.of(context)!.highImportance
-                              ? Colors.grey
-                              : Colors.red),
+                              ? theme.textTheme.bodySmall!.color
+                              : ColorPalette.lightColorRed),
                     )),
                 onSelected: (value) {
                   setState(() {
@@ -155,10 +158,8 @@ class _EditTaskPageState extends State<EditTaskPage> {
                     children: [
                       Text(
                         AppLocalizations.of(context)!.doUntilTitle,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16),
+                        style: theme.textTheme.bodyMedium!
+                            .copyWith(fontWeight: FontWeight.w400),
                       ),
                       if (selectedDate != null)
                         Text(
@@ -218,15 +219,18 @@ class _EditTaskPageState extends State<EditTaskPage> {
     return Card(
       margin: const EdgeInsets.all(0),
       semanticContainer: false,
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       elevation: 3,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-            boxShadow: const [BoxShadow(color: Colors.grey)]),
+            color: theme.colorScheme.surface,
+            boxShadow: const [BoxShadow(color: ColorPalette.lightColorGray)]),
         child: TextField(
+          onTapOutside: (event) {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
           controller: _controller,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
@@ -234,7 +238,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
           minLines: 4,
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)!.textFieldHint,
-            hintStyle: TextStyle(color: Color(0x36000000)),
+            hintStyle: theme.inputDecorationTheme.hintStyle,
             border: InputBorder.none,
           ),
         ),
@@ -279,14 +283,15 @@ class _EditTaskPageState extends State<EditTaskPage> {
           children: [
             Icon(
               Icons.delete,
-              color: Colors.red,
+              color: ColorPalette.lightColorRed,
             ),
             SizedBox(
               width: 10,
             ),
             Text(
               AppLocalizations.of(context)!.deleteButton,
-              style: TextStyle(color: Colors.red, fontSize: 16),
+              style: theme.textTheme.bodyMedium!
+                  .copyWith(color: ColorPalette.lightColorRed),
             )
           ],
         ),

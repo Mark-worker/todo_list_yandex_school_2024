@@ -51,7 +51,7 @@ class AppThemeData {
         color: ColorPalette.lightLabelPrimary,
       ),
       bodySmall: AppTextStyle.subheadStyle.copyWith(
-        color: ColorPalette.lightLabelPrimary,
+        color: ColorPalette.lightLabelTertiary,
       ),
       bodyLarge: AppTextStyle.buttonStyle.copyWith(
         color: ColorPalette.lightLabelPrimary,
@@ -78,8 +78,10 @@ class AppThemeData {
       checkColor: const WidgetStatePropertyAll(ColorPalette.lightColorWhite),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      labelStyle: AppTextStyle.buttonStyle,
-    ),
+        labelStyle: AppTextStyle.bodyStyle
+            .copyWith(color: ColorPalette.lightLabelPrimary),
+        hintStyle: AppTextStyle.bodyStyle
+            .copyWith(color: ColorPalette.lightLabelTertiary)),
     iconButtonTheme: const IconButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStatePropertyAll(
@@ -186,7 +188,7 @@ class AppThemeData {
     scaffoldBackgroundColor: ColorPalette.darkBackPrimary,
 
     appBarTheme: const AppBarTheme(
-      backgroundColor: ColorPalette.darkBackSecondary,
+      backgroundColor: ColorPalette.darkBackPrimary,
       surfaceTintColor: ColorPalette.darkBackPrimary,
       iconTheme: IconThemeData(
         color: ColorPalette.darkLabelPrimary,
@@ -233,8 +235,10 @@ class AppThemeData {
       checkColor: const WidgetStatePropertyAll(ColorPalette.lightColorWhite),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      labelStyle: AppTextStyle.buttonStyle,
-    ),
+        labelStyle: AppTextStyle.bodyStyle
+            .copyWith(color: ColorPalette.darkLabelPrimary),
+        hintStyle: AppTextStyle.bodyStyle
+            .copyWith(color: ColorPalette.darkLabelTertiary)),
     iconButtonTheme: const IconButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStatePropertyAll(

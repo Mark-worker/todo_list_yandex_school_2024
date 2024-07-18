@@ -1,15 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_states.dart';
-import 'package:todo_list_yandex_school_2024/feature/presentation/edit_task_screen/edit_task_screen.dart';
-import 'package:todo_list_yandex_school_2024/feature/presentation/main_screen/presentation/widgets/checkbox_line.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:todo_list_yandex_school_2024/service_locator.dart';
+import "package:flutter/material.dart";
+import "package:flutter_bloc/flutter_bloc.dart";
+import "package:todo_list_yandex_school_2024/core/date_formatter.dart";
+import "package:todo_list_yandex_school_2024/core/logger.dart";
+import "package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart";
+import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_states.dart";
+import "package:todo_list_yandex_school_2024/feature/presentation/edit_task_screen/edit_task_screen.dart";
+import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import "package:todo_list_yandex_school_2024/service_locator.dart";
+import "package:todo_list_yandex_school_2024/uikit/colors.dart";
+import "package:todo_list_yandex_school_2024/uikit/styles.dart";
 
 class MainPage extends StatefulWidget {
   MainPage({super.key});
@@ -34,6 +36,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   late TaskListBloc bloc;
+  late ThemeData theme;
 
   @override
   void initState() {
@@ -43,8 +46,9 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xfff7f6f2),
+      backgroundColor: theme.scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
             TaskModel? taskToAdd = await Navigator.push(context,
@@ -53,17 +57,14 @@ class _MainPageState extends State<MainPage> {
               bloc.add(AddTaskEvent(taskToAdd));
             }
           },
-          backgroundColor: Colors.blue,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(30)),
-          ),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          )),
+          backgroundColor: theme.colorScheme.primary,
+          shape: theme.floatingActionButtonTheme.shape,
+          child: Icon(Icons.add, color: theme.colorScheme.onPrimary)),
       body: RefreshIndicator(
+        backgroundColor: theme.colorScheme.surface,
+        color: theme.colorScheme.onSurface,
         edgeOffset: 150,
-        onRefresh: () async => context.read<TaskListBloc>().add(FetchDataEvent(
+        onRefresh: () async => bloc.add(FetchDataEvent(
             firstLaunch: getIt<LocalDataSource>().currentListOfTasks.isEmpty)),
         child:
             BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
@@ -91,9 +92,9 @@ class _MainPageState extends State<MainPage> {
                   delegate: SliverChildListDelegate([
                 Container(
                   margin: const EdgeInsets.all(8.0),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(6)),
-                      color: Colors.white),
+                      color: theme.colorScheme.surface),
                   child: Column(
                     children: [
                       TaskListBuilder(),
@@ -159,7 +160,8 @@ class _MainPageState extends State<MainPage> {
               margin: const EdgeInsets.all(8),
               child: Text(
                 AppLocalizations.of(context)!.newTask,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                style: AppTextStyle.bodyStyle
+                    .copyWith(color: theme.colorScheme.tertiary),
               ),
             ),
           )
@@ -171,7 +173,7 @@ class _MainPageState extends State<MainPage> {
   List<Widget> CustomAppBar() {
     return [
       SliverAppBar(
-          backgroundColor: Color(0xfff7f6f2),
+          backgroundColor: theme.appBarTheme.backgroundColor,
           pinned: true,
           snap: false,
           floating: true,
@@ -179,10 +181,9 @@ class _MainPageState extends State<MainPage> {
           flexibleSpace: FlexibleSpaceBar(
             title: Text(
               AppLocalizations.of(context)!.appBarTitle,
-              style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleLarge!.copyWith(
+                fontSize: 26,
+              ),
               textAlign: TextAlign.left,
             ),
           )),
@@ -197,7 +198,8 @@ class _MainPageState extends State<MainPage> {
                 ),
                 Text(
                   "${AppLocalizations.of(context)!.howMuchDone} - $numOfCheckedBoxes",
-                  style: const TextStyle(color: Colors.grey, fontSize: 16),
+                  style: theme.textTheme.titleMedium!
+                      .copyWith(color: theme.colorScheme.tertiary),
                 ),
               ],
             ),
@@ -211,7 +213,7 @@ class _MainPageState extends State<MainPage> {
                       (showUncompletedTasks
                           ? Icons.visibility_off
                           : Icons.visibility),
-                      color: Colors.blue,
+                      color: theme.colorScheme.primary,
                     )),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.04,
@@ -230,8 +232,7 @@ class _MainPageState extends State<MainPage> {
         confirmDismiss: (direction) {
           if (direction == DismissDirection.startToEnd) {
             bool newIsDone = !task.isDone;
-            TaskModel updatedTask =
-                task.copyWith(isDone: newIsDone);
+            TaskModel updatedTask = task.copyWith(isDone: newIsDone);
             setState(() {
               // print(listOfTasks);
               task = updatedTask;
@@ -245,15 +246,13 @@ class _MainPageState extends State<MainPage> {
         onDismissed: (DismissDirection direction) {
           if (direction == DismissDirection.endToStart) {
             bloc.add(DeleteTaskEvent(task));
-            
           } else {
-            bloc.add(UpdateTaskEvent(task.copyWith(
-                isDone: !task.isDone)));
+            bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
           }
         },
         background: Container(
-            color: Colors.green,
-            child: const Row(
+            color: theme.colorScheme.secondary,
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(),
@@ -262,14 +261,14 @@ class _MainPageState extends State<MainPage> {
                   child: Icon(
                     Icons.check,
                     size: 30,
-                    color: Colors.white,
+                    color: theme.colorScheme.onSecondary,
                   ),
                 ),
               ],
             )),
         secondaryBackground: Container(
-          color: Colors.red,
-          child: const Row(
+          color: theme.colorScheme.error,
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Padding(
@@ -277,7 +276,7 @@ class _MainPageState extends State<MainPage> {
                 child: Icon(
                   Icons.delete,
                   size: 30,
-                  color: Colors.white,
+                  color: theme.colorScheme.onError,
                 ),
               )
             ],
@@ -286,8 +285,100 @@ class _MainPageState extends State<MainPage> {
         child: CheckboxLine(
             task: task,
             onChanged: (bool? value) {
-              bloc.add(UpdateTaskEvent(task.copyWith(
-                  isDone: !task.isDone)));
+              bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
             }));
+  }
+}
+
+class CheckboxLine extends StatefulWidget {
+  final TaskModel task;
+  final ValueChanged<bool?> onChanged;
+
+  CheckboxLine({super.key, required this.task, required this.onChanged});
+
+  @override
+  State<CheckboxLine> createState() => _CheckboxLineState();
+}
+
+class _CheckboxLineState extends State<CheckboxLine> {
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: Checkbox(
+                activeColor: ColorPalette.lightColorGreen,
+                side: WidgetStateBorderSide.resolveWith(
+                  (states) => BorderSide(
+                      width: 2.0,
+                      color: widget.task.isDone
+                          ? ColorPalette.lightColorGreen
+                          : widget.task.priority != TaskPriority.high
+                              ? ColorPalette.lightColorGray
+                              : ColorPalette.lightColorRed),
+                ),
+                overlayColor: widget.task.priority != TaskPriority.high
+                    ? WidgetStateProperty.all(ColorPalette.lightColorGray)
+                    : WidgetStateProperty.all(ColorPalette.lightColorRed),
+                value: widget.task.isDone,
+                onChanged: widget.onChanged),
+          ),
+          Expanded(
+              flex: 6,
+              child: Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.task.text,
+                      style: widget.task.isDone
+                          ? theme.textTheme.bodyMedium!.copyWith(
+                              color: theme.textTheme.bodySmall!.color,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: theme.textTheme.bodySmall!.color,
+                            )
+                          : theme.textTheme.bodyMedium,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (widget.task.deadline != null)
+                      Text(
+                          formatDate(widget.task.deadline!,
+                              AppLocalizations.of(context)!.languageCode),
+                          style: theme.textTheme.bodySmall)
+                  ],
+                ),
+              )),
+          Expanded(
+            flex: 1,
+            child: IconButton(
+                onPressed: () async {
+                  TaskModel? newTask = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditTaskPage(
+                                editingTask: widget.task,
+                              )));
+                  if (newTask != null) {
+                    setState(() {
+                      context
+                          .read<TaskListBloc>()
+                          .add(UpdateTaskEvent(newTask));
+                    });
+                  }
+                },
+                icon: Icon(
+                  Icons.info_outline,
+                  color: theme.iconTheme.color,
+                )),
+          )
+        ],
+      ),
+    );
   }
 }

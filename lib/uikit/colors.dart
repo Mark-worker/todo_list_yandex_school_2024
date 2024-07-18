@@ -1,4 +1,4 @@
-import 'dart:ui';
+import "dart:ui";
 
 /// The color palette used in the app.
 /// Has all colors from the Figma design
