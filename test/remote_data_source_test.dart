@@ -28,7 +28,7 @@ void main() {
             "changed_at": 1720652252144,
             "created_at": 1720652252144,
             "done": false,
-            "id": "c9dba720-f6e3-107b-9dd5-978ed55be80e"
+            "id": "c9dba720-f6e3-107b-9dd5-978ed55be80e",
           },
           {
             "importance": "important",
@@ -37,11 +37,11 @@ void main() {
             "changed_at": 1720663248029,
             "created_at": 1720663248029,
             "done": false,
-            "id": "9217a620-5ae5-107c-b467-53d968c28cb3"
+            "id": "9217a620-5ae5-107c-b467-53d968c28cb3",
           }
         ],
         "status": "ok",
-        "revision": 1
+        "revision": 1,
       };
 
       when(mockDio.get(any)).thenAnswer(
@@ -68,7 +68,7 @@ void main() {
         "changed_at": 1720663248029,
         "created_at": 1720663248029,
         "done": false,
-        "id": "3ef1c6c0-9db1-107b-a69a-050c95ba5361"
+        "id": "3ef1c6c0-9db1-107b-a69a-050c95ba5361",
       });
 
       final responsePayload = {
@@ -76,9 +76,13 @@ void main() {
         "element": taskToAdd.toMap(),
       };
 
-      when(mockDio.post(any,
-              data: anyNamed("data"), options: anyNamed("options")))
-          .thenAnswer(
+      when(
+        mockDio.post(
+          any,
+          data: anyNamed("data"),
+          options: anyNamed("options"),
+        ),
+      ).thenAnswer(
         (_) async => Response(
           data: responsePayload,
           statusCode: 200,

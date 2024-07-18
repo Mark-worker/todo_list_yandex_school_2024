@@ -78,10 +78,11 @@ class AppThemeData {
       checkColor: const WidgetStatePropertyAll(ColorPalette.lightColorWhite),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        labelStyle: AppTextStyle.bodyStyle
-            .copyWith(color: ColorPalette.lightLabelPrimary),
-        hintStyle: AppTextStyle.bodyStyle
-            .copyWith(color: ColorPalette.lightLabelTertiary)),
+      labelStyle: AppTextStyle.bodyStyle
+          .copyWith(color: ColorPalette.lightLabelPrimary),
+      hintStyle: AppTextStyle.bodyStyle
+          .copyWith(color: ColorPalette.lightLabelTertiary),
+    ),
     iconButtonTheme: const IconButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStatePropertyAll(
@@ -235,10 +236,11 @@ class AppThemeData {
       checkColor: const WidgetStatePropertyAll(ColorPalette.lightColorWhite),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        labelStyle: AppTextStyle.bodyStyle
-            .copyWith(color: ColorPalette.darkLabelPrimary),
-        hintStyle: AppTextStyle.bodyStyle
-            .copyWith(color: ColorPalette.darkLabelTertiary)),
+      labelStyle:
+          AppTextStyle.bodyStyle.copyWith(color: ColorPalette.darkLabelPrimary),
+      hintStyle: AppTextStyle.bodyStyle
+          .copyWith(color: ColorPalette.darkLabelTertiary),
+    ),
     iconButtonTheme: const IconButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStatePropertyAll(

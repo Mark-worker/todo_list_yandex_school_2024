@@ -7,7 +7,8 @@ final routes = RouteMap(
   routes: {
     "/": (_) => const MaterialPage(child: MainPage()),
     "/editing/:id": (route) => MaterialPage(
-        child: EditTaskPage(editingTaskId: route.pathParameters["id"])),
+          child: EditTaskPage(editingTaskId: route.pathParameters["id"]),
+        ),
     "/creating": (_) => const MaterialPage(child: EditTaskPage()),
   },
 );
