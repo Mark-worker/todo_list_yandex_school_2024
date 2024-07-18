@@ -9,6 +9,7 @@ import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart";
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_states.dart";
 import "package:flutter_gen/gen_l10n/app_localizations.dart";
+import "package:todo_list_yandex_school_2024/flavor_config.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
 import "package:todo_list_yandex_school_2024/uikit/colors.dart";
 import "package:todo_list_yandex_school_2024/uikit/styles.dart";
@@ -188,7 +189,7 @@ class _MainPageState extends State<MainPage> {
         expandedHeight: 140,
         flexibleSpace: FlexibleSpaceBar(
           title: Text(
-            AppLocalizations.of(context)!.appBarTitle,
+            FlavorConfig.isProduction() ? AppLocalizations.of(context)!.appBarTitle : AppLocalizations.of(context)!.appBarTitleDebug,
             style: theme.textTheme.titleLarge!.copyWith(
               fontSize: 26,
             ),
@@ -370,19 +371,6 @@ class _CheckboxLineState extends State<CheckboxLine> {
             child: IconButton(
               onPressed: () async {
                 Routemaster.of(context).push("/editing/${widget.task.id}");
-                // TaskModel? newTask = await Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => EditTaskPage(
-                //               editingTask: widget.task,
-                //             )));
-                // if (newTask != null) {
-                //   setState(() {
-                //     context
-                //         .read<TaskListBloc>()
-                //         .add(UpdateTaskEvent(newTask));
-                //   });
-                // }
               },
               icon: Icon(
                 Icons.info_outline,

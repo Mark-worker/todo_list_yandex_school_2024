@@ -2,6 +2,7 @@
     "language" : "Русский",
     "languageCode": "ru",
     "appBarTitle": "Мои дела",
+    "appBarTitleDebug": "Мои дела (Debug!)",
     "howMuchDone": "Выполнено",
     "newTask": "Новое...",
     "noTasksAvailable": "У вас нет назначенных задач. Создайте задачу, нажав '+'",
