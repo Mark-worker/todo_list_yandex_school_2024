@@ -191,34 +191,26 @@ class _MainPageState extends State<MainPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.18,
-                ),
-                Text(
-                  "${AppLocalizations.of(context)!.howMuchDone} - $numOfCheckedBoxes",
-                  style: theme.textTheme.titleMedium!
-                      .copyWith(color: theme.colorScheme.tertiary),
-                ),
-              ],
+            Expanded(child: Container()),
+            Expanded(
+              flex: 4,
+              child: Text(
+                "${AppLocalizations.of(context)!.howMuchDone} - $numOfCheckedBoxes",
+                style: theme.textTheme.titleMedium!
+                    .copyWith(color: theme.colorScheme.tertiary),
+              ),
             ),
-            Row(
-              children: [
-                IconButton(
-                    onPressed: () => setState(() {
-                          showUncompletedTasks = !showUncompletedTasks;
-                        }),
-                    icon: Icon(
-                      (showUncompletedTasks
-                          ? Icons.visibility_off
-                          : Icons.visibility),
-                      color: theme.colorScheme.primary,
-                    )),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.04,
-                )
-              ],
+            Expanded(
+              child: IconButton(
+                  onPressed: () => setState(() {
+                        showUncompletedTasks = !showUncompletedTasks;
+                      }),
+                  icon: Icon(
+                    (showUncompletedTasks
+                        ? Icons.visibility_off
+                        : Icons.visibility),
+                    color: theme.colorScheme.primary,
+                  )),
             )
           ],
         ),
