@@ -8,6 +8,7 @@ import "package:routemaster/routemaster.dart";
 import 'package:todo_list_yandex_school_2024/feature/data/task_repository.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
+import "package:todo_list_yandex_school_2024/flavor_config.dart";
 import 'package:todo_list_yandex_school_2024/l10n/l10n.dart';
 import "package:todo_list_yandex_school_2024/routes.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
@@ -26,6 +27,7 @@ void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     logger.e("FlutterError \n ${details.exception} \n ${details.stack} \n");
   };
+  FlavorConfig(flavor: Flavor.staging);
   runZonedGuarded(
     () {
       WidgetsFlutterBinding.ensureInitialized();
@@ -50,8 +52,8 @@ class MainApp extends StatelessWidget {
         Provider<DeviceInfoPlugin>(create: (_) => getIt<DeviceInfoPlugin>()),
       ],
       child: MaterialApp.router(
-          title: "ToDo Space",
-          debugShowCheckedModeBanner: false,
+          title: FlavorConfig.isStaging() ? "ToDo Space (Debug)" : "ToDo Space",
+          debugShowCheckedModeBanner: FlavorConfig.isStaging(),
           supportedLocales: L10n.all,
           locale: const Locale('ru'),
           localizationsDelegates: const [
