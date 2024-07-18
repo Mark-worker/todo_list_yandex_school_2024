@@ -58,6 +58,23 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        staging {
+            dimension "default"
+            resValue "string", "app_name", "ToDo Space (Staging)"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+        }
+        production {
+            dimension "default"
+            resValue "string", "app_name", "ToDo Space"
+            applicationIdSuffix ".production"
+            versionNameSuffix "-production"
+        }
+    }
 }
 
 flutter {

@@ -11,6 +11,10 @@
     "@appBarTitle": {
         "description": "The text in the appbar at the main page with list of tasks"
     },
+    "appBarTitleDebug": "My Tasks (Debug!)",
+    "@appBarTitleDebug": {
+        "description": "The text in the appbar at the main page with list of tasks when flavor 'staging' is created"
+    },
     "howMuchDone": "Done",
     "@howMuchDone": {
         "description": "Counter of done tasks under the appbar at the main page"

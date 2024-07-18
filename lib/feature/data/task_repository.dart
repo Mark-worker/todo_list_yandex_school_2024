@@ -1,9 +1,9 @@
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart';
+import "package:internet_connection_checker/internet_connection_checker.dart";
+import "package:todo_list_yandex_school_2024/core/logger.dart";
+import "package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart";
+import "package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart";
+import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/i_task_repository.dart";
 
 class TaskRepository implements ITaskRepository {
   final LocalDataSource _localDataSource;
@@ -11,14 +11,12 @@ class TaskRepository implements ITaskRepository {
 
   TaskRepository(this._localDataSource, this._remoteDataSource);
 
-  List<TaskModel> get listOfTasks {
-    return _localDataSource.currentListOfTasks;
-  }
-
   void updateLocalRevision() {
     final int revision = _remoteDataSource.revision!;
     _localDataSource.setLocalRevision(revision);
   }
+
+  List<TaskModel> get listOfTasks => _localDataSource.currentListOfTasks;
 
   @override
   Future<List<TaskModel>> getAllTasks() async {
@@ -28,7 +26,7 @@ class TaskRepository implements ITaskRepository {
       int currentLocalRevision = await _localDataSource.getLocalRevision();
       int currentRemoteRevision = _remoteDataSource.revision!;
       logger.d(
-          "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}");
+          "revision remote: ${_remoteDataSource.revision} \n revision local: ${await _localDataSource.getLocalRevision()}",);
       if ((currentLocalRevision != currentRemoteRevision) && (currentLocalRevision != 0)) {
         logger.d("different revisions! merging lists...");
         logger.d(await _localDataSource.getAllTasks());

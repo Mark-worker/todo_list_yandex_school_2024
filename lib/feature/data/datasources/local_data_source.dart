@@ -1,14 +1,14 @@
-import 'dart:convert';
+import "dart:convert";
 
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/datasources/i_data_source.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
+import "package:internet_connection_checker/internet_connection_checker.dart";
+import "package:shared_preferences/shared_preferences.dart";
+import "package:todo_list_yandex_school_2024/core/logger.dart";
+import "package:todo_list_yandex_school_2024/feature/data/datasources/i_data_source.dart";
+import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
 
 class LocalDataSource implements IDataSource {
-  static const String _tasksKey = 'tasks_key';
-  static const String _revisionKey = 'revision_key';
+  static const String _tasksKey = "tasks_key";
+  static const String _revisionKey = "revision_key";
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   List<TaskModel> _currentListOfTasks = [];
