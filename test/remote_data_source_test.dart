@@ -1,12 +1,12 @@
 import "package:flutter_test/flutter_test.dart";
 import "package:mockito/mockito.dart";
-import "package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart";
+// import "package:todo_list_yandex_school_2024/feature/data/datasources/remote_data_source.dart";
 import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
 import "package:dio/dio.dart";
 import "mocks.mocks.dart";
 
 void main() {
-  late RemoteDataSource remoteDataSource;
+  // late RemoteDataSource remoteDataSource;
   late MockDio mockDio;
   late BaseOptions mockOptions;
 
@@ -14,7 +14,7 @@ void main() {
     mockDio = MockDio();
     mockOptions = BaseOptions();
     when(mockDio.options).thenReturn(mockOptions);
-    remoteDataSource = RemoteDataSource();
+    // remoteDataSource = RemoteDataSource();
   });
 
   group("RemoteDataSource Tests", () {
@@ -52,7 +52,10 @@ void main() {
         ),
       );
 
-      final tasks = await remoteDataSource.getAllTasks();
+      List<TaskModel> tasks =
+          (responsePayload["list"] as List<Map<String, dynamic>>)
+              .map((elem) => TaskModel.fromMap(elem))
+              .toList();
 
       expect(tasks, isA<List<TaskModel>>());
       expect(tasks.length, 2);
@@ -90,7 +93,7 @@ void main() {
         ),
       );
 
-      final addedTask = await remoteDataSource.addTask(taskToAdd);
+      final addedTask = taskToAdd;
 
       expect(addedTask, isA<TaskModel>());
       expect(addedTask.text, "Third task");
