@@ -80,7 +80,7 @@ class RemoteDataSource implements IDataSource {
               .map(
                 (elem) => elem.toMap(),
               )
-              .toList()
+              .toList(),
         },
       ),
       options: Options(

@@ -1,18 +1,22 @@
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todo_list_yandex_school_2024/core/date_formatter.dart';
-import 'package:todo_list_yandex_school_2024/feature/data/models/task_model.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
-import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
+import "package:device_info_plus/device_info_plus.dart";
+import "package:flutter/material.dart";
+import "package:provider/provider.dart";
+import "package:routemaster/routemaster.dart";
+import "package:todo_list_yandex_school_2024/core/date_formatter.dart";
+import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart";
+import "package:todo_list_yandex_school_2024/feature/data/task_repository.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart";
+import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart";
+import "package:todo_list_yandex_school_2024/feature/presentation/main_screen.dart";
+import "package:todo_list_yandex_school_2024/service_locator.dart";
 import "package:todo_list_yandex_school_2024/uikit/colors.dart";
-import 'package:uuid/uuid.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import "package:uuid/uuid.dart";
+import "package:flutter_gen/gen_l10n/app_localizations.dart";
 
 class EditTaskPage extends StatefulWidget {
-  final TaskModel? editingTask;
+  final String? editingTaskId;
 
-  const EditTaskPage({super.key, this.editingTask});
+  const EditTaskPage({super.key, this.editingTaskId});
 
   @override
   State<EditTaskPage> createState() => _EditTaskPageState();
@@ -26,16 +30,32 @@ class _EditTaskPageState extends State<EditTaskPage> {
   TaskPriority importanceValue = TaskPriority.none;
   DateTime? selectedDate;
   late ThemeData theme;
+  late TaskModel? editingTask;
 
   @override
   void initState() {
     super.initState();
-    isEditing = widget.editingTask != null;
-    _controller.text = isEditing ? widget.editingTask!.text : "";
-    switcherValue = isEditing ? widget.editingTask!.deadline != null : false;
-    importanceValue =
-        isEditing ? widget.editingTask!.priority : TaskPriority.none;
-    selectedDate = isEditing ? widget.editingTask!.deadline : null;
+    getTaskInfo();
+  }
+
+  void getTaskInfo() {
+    if (widget.editingTaskId == null) {
+      editingTask = null;
+    } else {
+      final List<TaskModel> tasks = (getIt<TaskRepository>().listOfTasks);
+
+      for (TaskModel task in tasks) {
+        if (task.id == widget.editingTaskId) {
+          editingTask = task;
+        }
+      }
+    }
+
+    isEditing = editingTask != null;
+    _controller.text = isEditing ? editingTask!.text : "";
+    switcherValue = isEditing ? editingTask!.deadline != null : false;
+    importanceValue = isEditing ? editingTask!.priority : TaskPriority.none;
+    selectedDate = isEditing ? editingTask!.deadline : null;
   }
 
   @override
@@ -51,37 +71,44 @@ class _EditTaskPageState extends State<EditTaskPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.close,
-              color: theme.colorScheme.onSurface,
-            )),
+          onPressed: () => Routemaster.of(context).pop(),
+          icon: Icon(
+            Icons.close,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
         actions: [
           TextButton(
-              onPressed: () async {
-                if (_controller.text == "") return;
+            onPressed: () async {
+              if (_controller.text == "") return;
 
-                if (isEditing) {
-                  final taskToChange = widget.editingTask!.copyWith(
-                      text: _controller.text,
-                      deadline: switcherValue
-                          ? selectedDate
-                          : DateTime.fromMillisecondsSinceEpoch(0),
-                      priority: importanceValue,
-                      changedAt: DateTime.now(),
-                      phoneIdentifier:
-                          await _getPhoneId(context.read<DeviceInfoPlugin>()));
-                  Navigator.pop(context, taskToChange);
-                } else {
-                  final taskToSave = await _formTask(
-                      context.read<Uuid>(), context.read<DeviceInfoPlugin>());
-                  Navigator.pop(context, taskToSave);
-                }
-              },
-              child: Text(
-                AppLocalizations.of(context)!.saveButton.toUpperCase(),
-                style: TextStyle(color: ColorPalette.lightColorBlue),
-              ))
+              if (isEditing) {
+                final taskToChange = editingTask!.copyWith(
+                  text: _controller.text,
+                  deadline: switcherValue
+                      ? selectedDate
+                      : DateTime.fromMillisecondsSinceEpoch(0),
+                  priority: importanceValue,
+                  changedAt: DateTime.now(),
+                  phoneIdentifier:
+                      await _getPhoneId(context.read<DeviceInfoPlugin>()),
+                );
+                await Routemaster.of(context).pop();
+                context.read<TaskListBloc>().add(UpdateTaskEvent(taskToChange));
+              } else {
+                final taskToSave = await _formTask(
+                  context.read<Uuid>(),
+                  context.read<DeviceInfoPlugin>(),
+                );
+                await Routemaster.of(context).pop();
+                context.read<TaskListBloc>().add(AddTaskEvent(taskToSave));
+              }
+            },
+            child: Text(
+              AppLocalizations.of(context)!.saveButton.toUpperCase(),
+              style: TextStyle(color: ColorPalette.lightColorBlue),
+            ),
+          ),
         ],
         backgroundColor: theme.appBarTheme.backgroundColor,
       ),
@@ -113,33 +140,38 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   return TaskPriority.values.map<PopupMenuItem>((item) {
                     String value = importanceToString(item);
                     return PopupMenuItem(
-                        value: item,
-                        child: SizedBox(
-                          width: 100,
-                          child: Text(value,
-                              style: theme.textTheme.bodyMedium!.copyWith(
-                                color: value !=
-                                        AppLocalizations.of(context)!
-                                            .highImportance
-                                    ? theme.textTheme.bodyMedium!.color
-                                    : ColorPalette.lightColorRed,
-                              ),
-                              textHeightBehavior: const TextHeightBehavior(
-                                  applyHeightToFirstAscent: true)),
-                        ));
+                      value: item,
+                      child: SizedBox(
+                        width: 100,
+                        child: Text(
+                          value,
+                          style: theme.textTheme.bodyMedium!.copyWith(
+                            color: value !=
+                                    AppLocalizations.of(context)!.highImportance
+                                ? theme.textTheme.bodyMedium!.color
+                                : ColorPalette.lightColorRed,
+                          ),
+                          textHeightBehavior: const TextHeightBehavior(
+                            applyHeightToFirstAscent: true,
+                          ),
+                        ),
+                      ),
+                    );
                   }).toList();
                 },
                 child: SizedBox(
-                    height: 30,
-                    width: double.infinity,
-                    child: Text(
-                      importanceToString(importanceValue),
-                      style: TextStyle(
-                          color: importanceToString(importanceValue) !=
-                                  AppLocalizations.of(context)!.highImportance
-                              ? theme.textTheme.bodySmall!.color
-                              : ColorPalette.lightColorRed),
-                    )),
+                  height: 30,
+                  width: double.infinity,
+                  child: Text(
+                    importanceToString(importanceValue),
+                    style: TextStyle(
+                      color: importanceToString(importanceValue) !=
+                              AppLocalizations.of(context)!.highImportance
+                          ? theme.textTheme.bodySmall!.color
+                          : ColorPalette.lightColorRed,
+                    ),
+                  ),
+                ),
                 onSelected: (value) {
                   setState(() {
                     importanceValue = value ?? "";
@@ -163,14 +195,16 @@ class _EditTaskPageState extends State<EditTaskPage> {
                       ),
                       if (selectedDate != null)
                         Text(
-                          formatDate(selectedDate!,
-                              AppLocalizations.of(context)!.languageCode),
+                          formatDate(
+                            selectedDate!,
+                            AppLocalizations.of(context)!.languageCode,
+                          ),
                           style:
                               const TextStyle(color: Colors.blue, fontSize: 14),
-                        )
+                        ),
                     ],
                   ),
-                  _DateSwitch()
+                  _DateSwitch(),
                 ],
               ),
               const SizedBox(
@@ -183,7 +217,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
               InkWell(
                 onTap: () {},
                 child: _DeleteButton(),
-              )
+              ),
             ],
           ),
         ),
@@ -193,10 +227,11 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2101));
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
@@ -224,9 +259,10 @@ class _EditTaskPageState extends State<EditTaskPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: theme.colorScheme.surface,
-            boxShadow: const [BoxShadow(color: ColorPalette.lightColorGray)]),
+          borderRadius: BorderRadius.circular(8),
+          color: theme.colorScheme.surface,
+          boxShadow: const [BoxShadow(color: ColorPalette.lightColorGray)],
+        ),
         child: TextField(
           onTapOutside: (event) {
             FocusManager.instance.primaryFocus?.unfocus();
@@ -248,33 +284,32 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   Widget _DateSwitch() {
     return Switch(
-        value: switcherValue,
-        onChanged: (value) async {
-          if (switcherValue) {
-            selectedDate = null;
+      value: switcherValue,
+      onChanged: (value) async {
+        if (switcherValue) {
+          selectedDate = null;
+        } else {
+          await _selectDate(context);
+        }
+        setState(() {
+          if (selectedDate != null) {
+            switcherValue = true;
           } else {
-            await _selectDate(context);
+            switcherValue = false;
           }
-          setState(() {
-            if (selectedDate != null) {
-              switcherValue = true;
-            } else {
-              switcherValue = false;
-            }
-          });
         });
+      },
+    );
   }
 
   Widget _DeleteButton() {
     return Container(
       margin: const EdgeInsets.all(4),
       child: InkWell(
-        onTap: () {
-          if (widget.editingTask != null) {
-            context
-                .read<TaskListBloc>()
-                .add(DeleteTaskEvent(widget.editingTask!));
-            Navigator.pop(context);
+        onTap: () async {
+          if (editingTask != null) {
+            await Routemaster.of(context).pop();
+            context.read<TaskListBloc>().add(DeleteTaskEvent(editingTask!));
           }
         },
         child: Row(
@@ -292,7 +327,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
               AppLocalizations.of(context)!.deleteButton,
               style: theme.textTheme.bodyMedium!
                   .copyWith(color: ColorPalette.lightColorRed),
-            )
+            ),
           ],
         ),
       ),
@@ -301,14 +336,15 @@ class _EditTaskPageState extends State<EditTaskPage> {
 
   Future<TaskModel> _formTask(Uuid uuid, DeviceInfoPlugin deviceInfo) async {
     return TaskModel(
-        id: uuid.v1(),
-        text: _controller.text,
-        priority: importanceValue,
-        isDone: false,
-        createdAt: DateTime.now(),
-        changedAt: DateTime.now(),
-        phoneIdentifier: await _getPhoneId(deviceInfo),
-        deadline: selectedDate);
+      id: uuid.v1(),
+      text: _controller.text,
+      priority: importanceValue,
+      isDone: false,
+      createdAt: DateTime.now(),
+      changedAt: DateTime.now(),
+      phoneIdentifier: await _getPhoneId(deviceInfo),
+      deadline: selectedDate,
+    );
   }
 
   Future<String> _getPhoneId(DeviceInfoPlugin deviceInfo) async {

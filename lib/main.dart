@@ -4,14 +4,16 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import "package:routemaster/routemaster.dart";
 import 'package:todo_list_yandex_school_2024/feature/data/task_repository.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart';
 import 'package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart';
 import 'package:todo_list_yandex_school_2024/l10n/l10n.dart';
+import "package:todo_list_yandex_school_2024/routes.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
 import 'package:flutter/material.dart';
 import 'package:todo_list_yandex_school_2024/core/logger.dart';
-import 'package:todo_list_yandex_school_2024/feature/presentation/main_screen/presentation/pages/main_screen.dart';
+import 'package:todo_list_yandex_school_2024/feature/presentation/main_screen.dart';
 import "package:todo_list_yandex_school_2024/uikit/themes.dart";
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -47,7 +49,7 @@ class MainApp extends StatelessWidget {
         Provider<Uuid>(create: (_) => getIt<Uuid>()),
         Provider<DeviceInfoPlugin>(create: (_) => getIt<DeviceInfoPlugin>()),
       ],
-      child: MaterialApp(
+      child: MaterialApp.router(
           title: "ToDo Space",
           debugShowCheckedModeBanner: false,
           supportedLocales: L10n.all,
@@ -60,7 +62,9 @@ class MainApp extends StatelessWidget {
           ],
           theme: AppThemeData.lightTheme,
           darkTheme: AppThemeData.darkTheme,
-          home: MainPage()),
+          routerDelegate:
+              RoutemasterDelegate(routesBuilder: (context) => routes),
+          routeInformationParser: RoutemasterParser(),),
     );
   }
 }

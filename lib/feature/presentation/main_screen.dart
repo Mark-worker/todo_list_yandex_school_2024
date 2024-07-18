@@ -1,5 +1,6 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
+import "package:routemaster/routemaster.dart";
 import "package:todo_list_yandex_school_2024/core/date_formatter.dart";
 import "package:todo_list_yandex_school_2024/core/logger.dart";
 import "package:todo_list_yandex_school_2024/feature/data/datasources/local_data_source.dart";
@@ -7,7 +8,7 @@ import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart";
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart";
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_states.dart";
-import "package:todo_list_yandex_school_2024/feature/presentation/edit_task_screen/edit_task_screen.dart";
+import "package:todo_list_yandex_school_2024/feature/presentation/edit_task_screen.dart";
 import "package:flutter_gen/gen_l10n/app_localizations.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
 import "package:todo_list_yandex_school_2024/uikit/colors.dart";
@@ -51,11 +52,7 @@ class _MainPageState extends State<MainPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            TaskModel? taskToAdd = await Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const EditTaskPage()));
-            if (taskToAdd != null) {
-              bloc.add(AddTaskEvent(taskToAdd));
-            }
+            Routemaster.of(context).push("/creating");
           },
           backgroundColor: theme.colorScheme.primary,
           shape: theme.floatingActionButtonTheme.shape,
@@ -143,11 +140,7 @@ class _MainPageState extends State<MainPage> {
   Widget NewTaskTile() {
     return InkWell(
       onTap: () async {
-        TaskModel? taskToAdd = await Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const EditTaskPage()));
-        if (taskToAdd != null) {
-          bloc.add(AddTaskEvent(taskToAdd));
-        }
+        Routemaster.of(context).push("/creating");
       },
       child: Row(
         mainAxisSize: MainAxisSize.max,
@@ -350,19 +343,20 @@ class _CheckboxLineState extends State<CheckboxLine> {
             flex: 1,
             child: IconButton(
                 onPressed: () async {
-                  TaskModel? newTask = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => EditTaskPage(
-                                editingTask: widget.task,
-                              )));
-                  if (newTask != null) {
-                    setState(() {
-                      context
-                          .read<TaskListBloc>()
-                          .add(UpdateTaskEvent(newTask));
-                    });
-                  }
+                  Routemaster.of(context).push("/editing/${widget.task.id}");
+                  // TaskModel? newTask = await Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => EditTaskPage(
+                  //               editingTask: widget.task,
+                  //             )));
+                  // if (newTask != null) {
+                  //   setState(() {
+                  //     context
+                  //         .read<TaskListBloc>()
+                  //         .add(UpdateTaskEvent(newTask));
+                  //   });
+                  // }
                 },
                 icon: Icon(
                   Icons.info_outline,

@@ -1,4 +1,4 @@
-import 'dart:convert';
+import "dart:convert";
 
 class TaskModel {
   final String id;
@@ -20,7 +20,7 @@ class TaskModel {
       this.hexColor,
       required this.createdAt,
       required this.changedAt,
-      required this.phoneIdentifier});
+      required this.phoneIdentifier,});
 
   TaskModel copyWith({
     String? id,
@@ -52,15 +52,15 @@ class TaskModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
-      'text': text,
-      'importance': priority.toJson,
-      'deadline': deadline?.millisecondsSinceEpoch,
-      'done': isDone,
-      'color': hexColor,
-      'created_at': createdAt.millisecondsSinceEpoch,
-      'changed_at': changedAt.millisecondsSinceEpoch,
-      'last_updated_by': phoneIdentifier,
+      "id": id,
+      "text": text,
+      "importance": priority.toJson,
+      "deadline": deadline?.millisecondsSinceEpoch,
+      "done": isDone,
+      "color": hexColor,
+      "created_at": createdAt.millisecondsSinceEpoch,
+      "changed_at": changedAt.millisecondsSinceEpoch,
+      "last_updated_by": phoneIdentifier,
     };
   }
 
@@ -68,7 +68,7 @@ class TaskModel {
 
   factory TaskModel.fromMap(Map<String, dynamic> map) {
     TaskPriority priority;
-    switch (map['importance']) {
+    switch (map["importance"]) {
       case "low":
         priority = TaskPriority.none;
       case "basic":
@@ -79,19 +79,19 @@ class TaskModel {
         priority = TaskPriority.none;
     }
     return TaskModel(
-        id: map['id'] as String,
-        text: map['text'] as String,
+        id: map["id"] as String,
+        text: map["text"] as String,
         priority: priority,
-        deadline: map['deadline'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(map['deadline'] as int)
+        deadline: map["deadline"] != null
+            ? DateTime.fromMillisecondsSinceEpoch(map["deadline"] as int)
             : null,
-        isDone: map['done'] as bool,
-        hexColor: map['color'] != null ? (map['color'] as String) : null,
+        isDone: map["done"] as bool,
+        hexColor: map["color"] != null ? (map["color"] as String) : null,
         createdAt:
-            DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
+            DateTime.fromMillisecondsSinceEpoch(map["created_at"] as int),
         changedAt:
-            DateTime.fromMillisecondsSinceEpoch(map['changed_at'] as int),
-        phoneIdentifier: map['last_updated_by'] as String);
+            DateTime.fromMillisecondsSinceEpoch(map["changed_at"] as int),
+        phoneIdentifier: map["last_updated_by"] as String,);
   }
 
   factory TaskModel.fromJson(String source) =>
