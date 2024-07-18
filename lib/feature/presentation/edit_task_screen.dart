@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import "package:device_info_plus/device_info_plus.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -7,7 +9,6 @@ import "package:todo_list_yandex_school_2024/feature/data/models/task_model.dart
 import "package:todo_list_yandex_school_2024/feature/data/task_repository.dart";
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_bloc.dart";
 import "package:todo_list_yandex_school_2024/feature/domain/todo_list_bloc/task_list_events.dart";
-import "package:todo_list_yandex_school_2024/feature/presentation/main_screen.dart";
 import "package:todo_list_yandex_school_2024/service_locator.dart";
 import "package:todo_list_yandex_school_2024/uikit/colors.dart";
 import "package:uuid/uuid.dart";
@@ -31,11 +32,15 @@ class _EditTaskPageState extends State<EditTaskPage> {
   DateTime? selectedDate;
   late ThemeData theme;
   late TaskModel? editingTask;
+  late TaskListBloc bloc;
+  late Routemaster routemaster;
 
   @override
   void initState() {
     super.initState();
     getTaskInfo();
+    bloc = context.read<TaskListBloc>();
+    routemaster = Routemaster.of(context);
   }
 
   void getTaskInfo() {
@@ -71,7 +76,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Routemaster.of(context).pop(),
+          onPressed: () => routemaster.pop(),
           icon: Icon(
             Icons.close,
             color: theme.colorScheme.onSurface,
@@ -93,20 +98,20 @@ class _EditTaskPageState extends State<EditTaskPage> {
                   phoneIdentifier:
                       await _getPhoneId(context.read<DeviceInfoPlugin>()),
                 );
-                await Routemaster.of(context).pop();
-                context.read<TaskListBloc>().add(UpdateTaskEvent(taskToChange));
+                await routemaster.pop();
+                bloc.add(UpdateTaskEvent(taskToChange));
               } else {
                 final taskToSave = await _formTask(
                   context.read<Uuid>(),
                   context.read<DeviceInfoPlugin>(),
                 );
-                await Routemaster.of(context).pop();
-                context.read<TaskListBloc>().add(AddTaskEvent(taskToSave));
+                await routemaster.pop();
+                bloc.add(AddTaskEvent(taskToSave));
               }
             },
             child: Text(
               AppLocalizations.of(context)!.saveButton.toUpperCase(),
-              style: TextStyle(color: ColorPalette.lightColorBlue),
+              style: const TextStyle(color: ColorPalette.lightColorBlue),
             ),
           ),
         ],
@@ -128,7 +133,7 @@ class _EditTaskPageState extends State<EditTaskPage> {
                 style: theme.textTheme.bodyMedium!
                     .copyWith(fontWeight: FontWeight.w400),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 2,
               ),
               PopupMenuButton(
@@ -308,19 +313,19 @@ class _EditTaskPageState extends State<EditTaskPage> {
       child: InkWell(
         onTap: () async {
           if (editingTask != null) {
-            await Routemaster.of(context).pop();
-            context.read<TaskListBloc>().add(DeleteTaskEvent(editingTask!));
+            await routemaster.pop();
+            bloc.add(DeleteTaskEvent(editingTask!));
           }
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.delete,
               color: ColorPalette.lightColorRed,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Text(
