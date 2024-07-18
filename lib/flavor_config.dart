@@ -1,7 +1,4 @@
-enum Flavor {
-  staging,
-  production
-}
+enum Flavor { staging, production }
 
 class FlavorConfig {
   final Flavor flavor;

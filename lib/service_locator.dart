@@ -11,11 +11,13 @@ void setupLocator() {
   // Register data sources
   getIt.registerLazySingleton<LocalDataSource>(() => LocalDataSource());
   getIt.registerLazySingleton<RemoteDataSource>(
-      () => RemoteDataSource());
+    () => RemoteDataSource(),
+  );
 
   // Register repository
-  getIt.registerLazySingleton<TaskRepository>(() =>
-      TaskRepository(getIt<LocalDataSource>(), getIt<RemoteDataSource>()));
+  getIt.registerLazySingleton<TaskRepository>(
+    () => TaskRepository(getIt<LocalDataSource>(), getIt<RemoteDataSource>()),
+  );
 
   //Register external
   getIt.registerLazySingleton<Uuid>(() => const Uuid());

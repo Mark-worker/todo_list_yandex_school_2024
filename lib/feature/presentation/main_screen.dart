@@ -50,75 +50,91 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            Routemaster.of(context).push("/creating");
-          },
-          backgroundColor: theme.colorScheme.primary,
-          shape: theme.floatingActionButtonTheme.shape,
-          child: Icon(Icons.add, color: theme.colorScheme.onPrimary),),
+        onPressed: () async {
+          Routemaster.of(context).push("/creating");
+        },
+        backgroundColor: theme.colorScheme.primary,
+        shape: theme.floatingActionButtonTheme.shape,
+        child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
+      ),
       body: RefreshIndicator(
         backgroundColor: theme.colorScheme.surface,
         color: theme.colorScheme.onSurface,
         edgeOffset: 150,
-        onRefresh: () async => bloc.add(FetchDataEvent(
-            firstLaunch: getIt<LocalDataSource>().currentListOfTasks.isEmpty,),),
-        child:
-            BlocBuilder<TaskListBloc, TaskListState>(builder: (context, state) {
-          if (state is EmptyState || state is LoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is LoadingState) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is LoadedState && state.listOfTasks.isEmpty) {
-            return SafeArea(
+        onRefresh: () async => bloc.add(
+          FetchDataEvent(
+            firstLaunch: getIt<LocalDataSource>().currentListOfTasks.isEmpty,
+          ),
+        ),
+        child: BlocBuilder<TaskListBloc, TaskListState>(
+          builder: (context, state) {
+            if (state is EmptyState || state is LoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is LoadingState) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is LoadedState && state.listOfTasks.isEmpty) {
+              return SafeArea(
                 child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
                         child: Text(
-                            AppLocalizations.of(context)!.noTasksAvailable,),),),
-              ],
-            ),);
-          } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
-            listOfTasks = state.listOfTasks;
-            _updateTaskList();
-            return CustomScrollView(slivers: [
-              ...CustomAppBar(),
-              SliverList(
-                  delegate: SliverChildListDelegate([
-                Container(
-                  margin: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(6)),
-                      color: theme.colorScheme.surface,),
-                  child: Column(
-                    children: [
-                      TaskListBuilder(),
-                      NewTaskTile(),
-                    ],
+                          AppLocalizations.of(context)!.noTasksAvailable,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else if (state is LoadedState && state.listOfTasks.isNotEmpty) {
+              listOfTasks = state.listOfTasks;
+              _updateTaskList();
+              return CustomScrollView(
+                slivers: [
+                  ...CustomAppBar(),
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      Container(
+                        margin: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6)),
+                          color: theme.colorScheme.surface,
+                        ),
+                        child: Column(
+                          children: [
+                            TaskListBuilder(),
+                            NewTaskTile(),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 25,
+                      ),
+                    ]),
                   ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-              ]),),
-            ],);
-          } else if (state is ErrorState) {
-            logger.e(state.exception);
-            return SafeArea(
+                ],
+              );
+            } else if (state is ErrorState) {
+              logger.e(state.exception);
+              return SafeArea(
                 child: CustomScrollView(
-              slivers: [
-                SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Center(
-                        child:
-                            Text(AppLocalizations.of(context)!.errorMessage),),),
-              ],
-            ),);
-          } else {
-            return const Placeholder();
-          }
-        },),
+                  slivers: [
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Center(
+                        child: Text(AppLocalizations.of(context)!.errorMessage),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const Placeholder();
+            }
+          },
+        ),
       ),
     );
   }
@@ -165,20 +181,21 @@ class _MainPageState extends State<MainPage> {
   List<Widget> CustomAppBar() {
     return [
       SliverAppBar(
-          backgroundColor: theme.appBarTheme.backgroundColor,
-          pinned: true,
-          snap: false,
-          floating: true,
-          expandedHeight: 140,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Text(
-              AppLocalizations.of(context)!.appBarTitle,
-              style: theme.textTheme.titleLarge!.copyWith(
-                fontSize: 26,
-              ),
-              textAlign: TextAlign.left,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        pinned: true,
+        snap: false,
+        floating: true,
+        expandedHeight: 140,
+        flexibleSpace: FlexibleSpaceBar(
+          title: Text(
+            AppLocalizations.of(context)!.appBarTitle,
+            style: theme.textTheme.titleLarge!.copyWith(
+              fontSize: 26,
             ),
-          ),),
+            textAlign: TextAlign.left,
+          ),
+        ),
+      ),
       SliverToBoxAdapter(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -194,15 +211,16 @@ class _MainPageState extends State<MainPage> {
             ),
             Expanded(
               child: IconButton(
-                  onPressed: () => setState(() {
-                        showUncompletedTasks = !showUncompletedTasks;
-                      }),
-                  icon: Icon(
-                    (showUncompletedTasks
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                    color: theme.colorScheme.primary,
-                  ),),
+                onPressed: () => setState(() {
+                  showUncompletedTasks = !showUncompletedTasks;
+                }),
+                icon: Icon(
+                  (showUncompletedTasks
+                      ? Icons.visibility_off
+                      : Icons.visibility),
+                  color: theme.colorScheme.primary,
+                ),
+              ),
             ),
           ],
         ),
@@ -212,65 +230,68 @@ class _MainPageState extends State<MainPage> {
 
   Widget _DismissibleTask(TaskModel task, int index, BuildContext context) {
     return Dismissible(
-        key: UniqueKey(),
-        confirmDismiss: (direction) {
-          if (direction == DismissDirection.startToEnd) {
-            bool newIsDone = !task.isDone;
-            TaskModel updatedTask = task.copyWith(isDone: newIsDone);
-            setState(() {
-              // print(listOfTasks);
-              task = updatedTask;
-              // print(listOfTasks);
-            });
-            bloc.add(UpdateTaskEvent(updatedTask));
-            return Future.value(false);
-          }
-          return Future.value(true);
-        },
-        onDismissed: (DismissDirection direction) {
-          if (direction == DismissDirection.endToStart) {
-            bloc.add(DeleteTaskEvent(task));
-          } else {
-            bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
-          }
-        },
-        background: Container(
-            color: theme.colorScheme.secondary,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const SizedBox(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Icon(
-                    Icons.check,
-                    size: 30,
-                    color: theme.colorScheme.onSecondary,
-                  ),
-                ),
-              ],
-            ),),
-        secondaryBackground: Container(
-          color: theme.colorScheme.error,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: Icon(
-                  Icons.delete,
-                  size: 30,
-                  color: theme.colorScheme.onError,
-                ),
+      key: UniqueKey(),
+      confirmDismiss: (direction) {
+        if (direction == DismissDirection.startToEnd) {
+          bool newIsDone = !task.isDone;
+          TaskModel updatedTask = task.copyWith(isDone: newIsDone);
+          setState(() {
+            // print(listOfTasks);
+            task = updatedTask;
+            // print(listOfTasks);
+          });
+          bloc.add(UpdateTaskEvent(updatedTask));
+          return Future.value(false);
+        }
+        return Future.value(true);
+      },
+      onDismissed: (DismissDirection direction) {
+        if (direction == DismissDirection.endToStart) {
+          bloc.add(DeleteTaskEvent(task));
+        } else {
+          bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
+        }
+      },
+      background: Container(
+        color: theme.colorScheme.secondary,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Icon(
+                Icons.check,
+                size: 30,
+                color: theme.colorScheme.onSecondary,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        child: CheckboxLine(
-            task: task,
-            onChanged: (bool? value) {
-              bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
-            },),);
+      ),
+      secondaryBackground: Container(
+        color: theme.colorScheme.error,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Icon(
+                Icons.delete,
+                size: 30,
+                color: theme.colorScheme.onError,
+              ),
+            ),
+          ],
+        ),
+      ),
+      child: CheckboxLine(
+        task: task,
+        onChanged: (bool? value) {
+          bloc.add(UpdateTaskEvent(task.copyWith(isDone: !task.isDone)));
+        },
+      ),
+    );
   }
 }
 
@@ -295,72 +316,79 @@ class _CheckboxLineState extends State<CheckboxLine> {
           Expanded(
             flex: 1,
             child: Checkbox(
-                activeColor: ColorPalette.lightColorGreen,
-                side: WidgetStateBorderSide.resolveWith(
-                  (states) => BorderSide(
-                      width: 2.0,
-                      color: widget.task.isDone
-                          ? ColorPalette.lightColorGreen
-                          : widget.task.priority != TaskPriority.high
-                              ? ColorPalette.lightColorGray
-                              : ColorPalette.lightColorRed,),
+              activeColor: ColorPalette.lightColorGreen,
+              side: WidgetStateBorderSide.resolveWith(
+                (states) => BorderSide(
+                  width: 2.0,
+                  color: widget.task.isDone
+                      ? ColorPalette.lightColorGreen
+                      : widget.task.priority != TaskPriority.high
+                          ? ColorPalette.lightColorGray
+                          : ColorPalette.lightColorRed,
                 ),
-                overlayColor: widget.task.priority != TaskPriority.high
-                    ? WidgetStateProperty.all(ColorPalette.lightColorGray)
-                    : WidgetStateProperty.all(ColorPalette.lightColorRed),
-                value: widget.task.isDone,
-                onChanged: widget.onChanged,),
+              ),
+              overlayColor: widget.task.priority != TaskPriority.high
+                  ? WidgetStateProperty.all(ColorPalette.lightColorGray)
+                  : WidgetStateProperty.all(ColorPalette.lightColorRed),
+              value: widget.task.isDone,
+              onChanged: widget.onChanged,
+            ),
           ),
           Expanded(
-              flex: 6,
-              child: Padding(
-                padding: const EdgeInsets.all(1.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            flex: 6,
+            child: Padding(
+              padding: const EdgeInsets.all(1.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.task.text,
+                    style: widget.task.isDone
+                        ? theme.textTheme.bodyMedium!.copyWith(
+                            color: theme.textTheme.bodySmall!.color,
+                            decoration: TextDecoration.lineThrough,
+                            decorationColor: theme.textTheme.bodySmall!.color,
+                          )
+                        : theme.textTheme.bodyMedium,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (widget.task.deadline != null)
                     Text(
-                      widget.task.text,
-                      style: widget.task.isDone
-                          ? theme.textTheme.bodyMedium!.copyWith(
-                              color: theme.textTheme.bodySmall!.color,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: theme.textTheme.bodySmall!.color,
-                            )
-                          : theme.textTheme.bodyMedium,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                      formatDate(
+                        widget.task.deadline!,
+                        AppLocalizations.of(context)!.languageCode,
+                      ),
+                      style: theme.textTheme.bodySmall,
                     ),
-                    if (widget.task.deadline != null)
-                      Text(
-                          formatDate(widget.task.deadline!,
-                              AppLocalizations.of(context)!.languageCode,),
-                          style: theme.textTheme.bodySmall,),
-                  ],
-                ),
-              ),),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             flex: 1,
             child: IconButton(
-                onPressed: () async {
-                  Routemaster.of(context).push("/editing/${widget.task.id}");
-                  // TaskModel? newTask = await Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => EditTaskPage(
-                  //               editingTask: widget.task,
-                  //             )));
-                  // if (newTask != null) {
-                  //   setState(() {
-                  //     context
-                  //         .read<TaskListBloc>()
-                  //         .add(UpdateTaskEvent(newTask));
-                  //   });
-                  // }
-                },
-                icon: Icon(
-                  Icons.info_outline,
-                  color: theme.iconTheme.color,
-                ),),
+              onPressed: () async {
+                Routemaster.of(context).push("/editing/${widget.task.id}");
+                // TaskModel? newTask = await Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => EditTaskPage(
+                //               editingTask: widget.task,
+                //             )));
+                // if (newTask != null) {
+                //   setState(() {
+                //     context
+                //         .read<TaskListBloc>()
+                //         .add(UpdateTaskEvent(newTask));
+                //   });
+                // }
+              },
+              icon: Icon(
+                Icons.info_outline,
+                color: theme.iconTheme.color,
+              ),
+            ),
           ),
         ],
       ),

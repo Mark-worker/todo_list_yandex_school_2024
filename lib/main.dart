@@ -18,7 +18,6 @@ import "package:todo_list_yandex_school_2024/uikit/themes.dart";
 import 'package:uuid/uuid.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 void main() {
   PlatformDispatcher.instance.onError = (error, stackTrace) {
     logger.e("PlatformDispatcher \n $error \n $stackTrace \n");
@@ -46,27 +45,28 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         BlocProvider(
-            create: (context) =>
-                TaskListBloc(getIt<TaskRepository>())..add(FetchDataEvent()),),
+          create: (context) =>
+              TaskListBloc(getIt<TaskRepository>())..add(FetchDataEvent()),
+        ),
         Provider<Uuid>(create: (_) => getIt<Uuid>()),
         Provider<DeviceInfoPlugin>(create: (_) => getIt<DeviceInfoPlugin>()),
       ],
       child: MaterialApp.router(
-          title: FlavorConfig.isStaging() ? "ToDo Space (Debug)" : "ToDo Space",
-          debugShowCheckedModeBanner: FlavorConfig.isStaging(),
-          supportedLocales: L10n.all,
-          locale: const Locale('ru'),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          theme: AppThemeData.lightTheme,
-          darkTheme: AppThemeData.darkTheme,
-          routerDelegate:
-              RoutemasterDelegate(routesBuilder: (context) => routes),
-          routeInformationParser: const RoutemasterParser(),),
+        title: FlavorConfig.isStaging() ? "ToDo Space (Debug)" : "ToDo Space",
+        debugShowCheckedModeBanner: FlavorConfig.isStaging(),
+        supportedLocales: L10n.all,
+        locale: const Locale('ru'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppThemeData.lightTheme,
+        darkTheme: AppThemeData.darkTheme,
+        routerDelegate: RoutemasterDelegate(routesBuilder: (context) => routes),
+        routeInformationParser: const RoutemasterParser(),
+      ),
     );
   }
 }
